@@ -1,0 +1,18 @@
+@startuml
+
+start
+
+:Vykonání instrukce;
+
+if (Je přerušení?) then (ano)
+    :Ulož stav;
+    :ISR rutina;
+    :Obnov stav;
+    :Návrat do programu;
+else (ne)
+    :další instrukce;
+endif
+
+stop
+
+@enduml

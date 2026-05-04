@@ -1,0 +1,149 @@
+\chapter{Počítačová paměť}
+
+K uchovávání většího objemu dat, než může dovolit počet procesoru, slouží \textbf{počítačová paměť.}
+Toto zařízení skládá se z \textbf{paměťových buněk}, každá z kterých uchovává jednotku informace.
+Každá buňka má pevně přiřazenou adresu, pomocí které procesor může k této buňce přistupovat
+(adresovat). Paměťová buňka je minimální adresovací jednotka.
+
+Rozdělení pamětí podle :
+
+\begin{itemize}
+    \item \textbf{Random access memory} (\textit{RAM}) - paměť, podporující zápis i čtení.
+        \begin{itemize}
+            \item Static RAM (SRAM) - každá paměťová buňka je sestavena z D flip-flopů.
+            \item Dynamic RAM (DRAM) - každá paměťová buňka je sestavena z tranzistoru (zpravidla
+                MOSFET) a kondenzátoru. Hlavní nevýhodou je, že nahromaděný náboj na kondenzátoru má
+            tendenci unikat, kvůli čemu táto paměť musí se periodicky obnovovat (\textit{refresh}).
+            \item Synchronous DRAM (SDRAM) - hybrid statické a dynamické RAM.
+        \end{itemize}
+    \item \textbf{Read-only memory} (\textit{ROM}) - paměť, podporující jenom čtení. Obsah je
+        předem zapsán výrobcem pamětí.
+\end{itemize}
+
+Obvykle rozdělení RAM a ROM podle technologie nemá význam pro emulaci, ale pro větší přesnost
+emulátor může např. emulovat  unik elektrických nábojů v DRAM pamětí.
+
+\section{Reprezentace dat v počítači}
+
+Většina počítačových systémů využívá \emph{digitální veličiny} k reprezentaci vnitřního stavu a dalších
+dat. Digitální veličiny jsou hodnoty, které nabývají konečného počtu diskrétních stavů. Tento přístup
+vychází z fyzikálních vlastností elektrických obvodů. Přestože elektrické obvody pracují s
+analogovými veličinami, jako jsou napětí a proud, lze tyto veličiny rozdělit do určitých intervalů,
+přičemž každý interval odpovídá jednomu diskrétnímu stavu. S rostoucím počtem rozlišovaných stavů
+se však zmenšuje rozdíl mezi sousedními hodnotami, čímž se systém stává méně spolehlivým vlivem
+elektrického šumu. Zároveň je nutné používat přesnější a složitější elektrické obvody, což zvyšuje
+jejich cenu a náročnost návrhu. Z těchto důvodů se pro reprezentaci digitálních hodnot používá
+dvojková číselná soustava, ve které je nutné rozlišit pouze dva stavy — 0 a 1.
+
+Jedna jednotka takové informace, která nabývá stavů 0 a 1, se nazývá \textbf{bit} (z anglického
+\textit{binary digit}). Další základní jednotkou je \textbf{bajt} neboli \textbf{byte} o velikosti 8
+bitů, a nabývá hodnot 0 až 255 v desítkové soustavě. Kombinace dvou bytů (16 bitů) tvoří \textbf{slovo}
+(\textit{word}). Kombinace 4 bytů (32 bitů) tvoří dvouslovo (\textit{double word} --
+\textit{dword}).
+
+V tabulce \ref{tab:data_units} je uveden přehled jednotek odvozených od základní jednotky byte.
+Historicky se používaly předpony soustavy SI, které vyjadřují mocniny deseti. Pro zachování vazby na
+mocniny dvou byly později zavedeny binární předpony, jako například kibi nebo mebi.
+
+\begin{table}
+    \centering
+    \begin{tabular}{llp{5cm}l}
+        \toprule
+        \textbf{Jednotka} & \textbf{Značka} & \textbf{B} & Mocnina $2^n$ \\
+        \midrule
+        Byte & B & 8 & $2^3$ \\
+        Kilobyte & kB & \num{1000} & -- \\
+        Kibibyte & KiB & \num{1024} & $2^{10}$ \\
+        Megabyte & MB & \num{1000000} & -- \\
+        Mebibyte & MiB & \num{1048576} & $2^{20}$ \\
+        Gigabyte & GB & $10^9$ & -- \\
+        Gibibyte & GiB & ~$\num{1.074}\times10^9$ & $2^{30}$\\
+        Terabyte & TB & $10^{12}$ & -- \\
+        Tebibyte & TiB & ~$\num{1.1}\times10^{12}$ & $2^{40}$ \\
+        \bottomrule
+    \end{tabular}
+    \caption{Přehled jednotek digitálních dat.}
+    \label{tab:data_units}
+\end{table}
+
+Historicky, u různých komerčních počítačů jedna paměťová buňka mohla obsahovat různý počet bitů, ale
+později se ustálilo použití jednoho bytu (8 bitů) jako minimální adresovací jednotky v pamětí.
+
+\section{Adresní prostor}
+
+\textbf{Adresní prostor} je rozsah diskrétních paměťových adres, přičemž každá jednotlivá adresa
+muže odpovídat zařízení, diskovému sektoru, registru, fyzické paměti, nebo jiné entitě. Díky
+adresnímu prostoru, paměť slouží pro CPU nejenom jako úložiště dat, ale také jako \textbf{mapa
+okolního světa}.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}{0.45\textwidth}
+        \includesvg[width=0.9\textwidth]{images/flat_memory.svg}
+        \caption{Lineární adresní prostor.}
+        \label{fig:flat_memory}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}{0.45\textwidth}
+        \includesvg[width=1.1\textwidth]{images/segmented_memory.svg}
+        \caption{Segmentovaný adresní prostor.}
+        \label{fig:segmented_memory}
+    \end{subfigure}
+    \caption{Reprezentace adresního prostoru.}
+    \label{fig:address_space}
+\end{figure}
+
+Existují dva rozšířené modely adresního prostoru:
+
+\begin{itemize}
+    \item \textbf{Lineární adresní prostor (ploché adresní rozložení)} -- metoda adresování pamětí,
+        kde je procesoru přímo přístupný celý rozsah pamětí jako jedno souvislé jednorozměrné pole.
+        Každá buňka má unikátní index od $0$ do $2^n - 1$, kde $n$ je bitová šířka sběrnice (obr.
+        \ref{fig:flat_memory}).
+    \item \textbf{Segmentování pamětí} -- model, který rozděluje adresní prostor na logické celky zvané
+        \textbf{segmenty}. Adresa se pak neskládá z jednoho čísla, ale z dvojice: \textit{selektor
+        segmentu} a \textit{offset} (posun) v rámci tohoto segmentu. Tato metoda byla klíčová pro
+        překonání limitů 16-bitových procesorů (např. Intel 8086), kde umožnila adresovat až 1~MB
+        paměti pomocí dvou 16-bitových hodnot (obr. \ref{fig:segmented_memory}).
+\end{itemize}
+
+\section{Bank switching}
+
+U mnoha historických 8-bitových systémů (např. NES) se setkáváme s problémem, kdy je
+adresní rozsah procesoru (typicky 64~KiB) nedostatečný pro rostoucí nároky softwaru. Řešením je
+technika \textbf{přepínání bank (bank switching)}.
+
+Tento mechanismus umožňuje procesoru přistupovat k mnohem větší fyzické paměti tím, že v adresní
+mapě vytvoří „okno“ (banku), do kterého lze dynamicky mapovat různé části externí paměti.
+
+\section{Mapování}
+
+\begin{figure}[H]
+    \centering
+    \includesvg[width=\textwidth]{images/memory_map.svg}
+    \caption{Mapovaní pamětí: RAM, grafická jednotka, zvuková jednotka a vstup.}
+    \label{fig:memory_map}
+\end{figure}
+
+Přiřazení rozsahu adresního prostoru nějakému zařízení se nazývá \textbf{mapování}, a je
+zprostředkováno primárně sběrnici (viz kapitola \ref{ch:tp-bus}). Přičemž z pohledu CPU neexistuje
+rozdíl mezi přístupem k pamětí nebo k zařízení - existují pouze paměťové adresy, a pro komunikaci
+s externími zařízeními se používají stejné instrukce jako pro běžný přístup k pamětí. I paměť je
+externí zařízení, přípojené k sběrnici (obr. \ref{fig:memory_map}).
+
+Jakýkoli Přístup k pamětí může mít \textbf{vedlejší účinky} (\textit{side effects}) na CPU nebo
+okolí komponenty (včetně přistupovaného). Např. v systému NES čtení stavového registru grafické
+jednotky dojde k vynulovaní příznaku sudosti aktuálního zápisu do video pamětí.
+
+\section{Endianita (pořadí bajtů)}
+
+\textbf{Endianita} definuje způsob, jakým jsou v paměti uloženy vícebytové datové typy (např.
+16-bitová nebo 32-bitová celá čísla). Rozlišujeme dva základní typy:
+
+\begin{itemize}
+    \item \textbf{Little-endian}: Nejméně významný byte (LSB) je uložen na nejnižší adrese. Toto
+        schéma využívá většina moderních procesorů (x86, ARM).
+    \item \textbf{Big-endian}: Nejvýznamnější byte (MSB) je uložen na nejnižší adrese. Tento způsob
+        je přirozenější pro lidské čtení hexadecimálních výpisů a využívají jej například procesory
+        řady Motorola 68000.
+\end{itemize}

@@ -1,0 +1,65 @@
+\section{Čtení vstupu z ovladačů}
+
+Pro zajištění přesného časování řídicích signálů a hardwarové akcelerace komunikace byl využit
+subsystém PIO (\textit{Programmable I/O}), který je specifický pro mikrokontroléry RP2040/RP2350.
+
+\subsection{Implementace}
+
+Inicializace PIO automatu probíhá pomocí dedikovaných funkcí:
+
+\begin{itemize}
+    \item \texttt{pio\_claim\_free\_sm\_and\_add\_program()} -- zkompilovaný PIO program nahraje do
+        instrukční paměti, zkonfiguruje mapování příslušných GPIO pinů a nastaví děličku hodin.
+        Druhá funkce nastaví piny.
+    \item \texttt{joypad\_read\_program\_init()} -- nastaví piny na potřebné vývody.
+\end{itemize}
+
+Komunikace je rozdělena na hardwarovou část (PIO program) a softwarovou obsluhu v jazyce C. PIO
+program (výpis \ref{lst:pio_joypad}) je navržen tak, aby po obdržení signálu od procesoru
+vygeneroval impulz na pinu \texttt{LATCH} a následně pomocí osmi hodinových cyklů na pinu
+\texttt{CLOCK} paralelně přečetl datové bity z obou posuvných registrů.
+
+Taktování PIO automatu je softwarově sníženo na frekvenci přibližně 1~MHz (souhlasí s datasheetem
+posuvného registru CD4021), takže spuštění jedné instrukce trvá 1~$\mu$s.
+
+\begin{listing}[htbp]
+\small
+\begin{minted}{gas}
+; PIO program pro taktování čipu CD4021 a čtení jeho sériového výstupu
+.program joypad_read
+
+; Set piny ovládají signál LATCH (Strobe)
+; Sideset piny ovládají signál CLOCK
+; In piny čtou datové výstupy ovladačů
+.side_set 1
+
+; Definice zpoždění (v cyklech) pro dodržení časování CD4021 (~15 us)
+.define CLK_TIME 15
+.define STR_TIME 15
+
+.wrap_target
+    pull block         side 0             ; Čekání na příkaz od CPU (přes TX FIFO)
+    mov isr, null      side 0
+
+    set pins, 1        side 0             ; LATCH = 1 (Vzorkování tlačítek)
+    nop                side 0 [STR_TIME]  ; Prodleva
+    set pins, 0        side 0             ; LATCH = 0
+
+    set x, 7           side 0             ; Nastavení počítadla smyčky na 8 iterací
+read_bit:
+    in pins, 2         side 0 [CLK_TIME]  ; CLK = 0, přečtení 2 pinů současně
+    jmp x-- read_bit   side 1             ; CLK = 1, skok na další bit
+
+    push block         side 0             ; Odeslání nasbíraných dat do RX FIFO
+.wrap
+\end{minted}
+\caption{Zdrojový kód PIO programu pro asynchronní čtení ovladačů.}
+\label{lst:pio_joypad}
+\end{listing}
+
+Před zahájením emulace každého snímku je volána funkce \texttt{update\_joypads()}. Její obsluha
+spočívá v odeslání prázdného povelu (nuly) do TX fronty stavového automatu, čímž se spustí smyčka
+PIO programu. PIO následně přečte 8 dvojic bitů (jeden bit pro každý ovladač v každém cyklu) a
+16bitový výsledek vrátí přes RX frontu. Datové slovo je následně v jazyce C bitovými operacemi
+rozděleno do samostatných bytů pro první a druhý ovladač. Táto funkce také zajišťuje synchronizaci s
+PIO blokem.

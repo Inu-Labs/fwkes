@@ -1,0 +1,140 @@
+(footprint "MINI DIN CONNECTOR MD-50SGK"
+	(version 20241229)
+	(generator "pcbnew")
+	(generator_version "9.0")
+	(layer "F.Cu")
+	(property "Reference" "REF**"
+		(at 0 -9.5 0)
+		(unlocked yes)
+		(layer "F.SilkS")
+		(uuid "cc8749d0-ab96-4e2d-890b-67d8a7e2cae5")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+		)
+	)
+	(property "Value" "MINI DIN CONNECTOR MD-50SGK"
+		(at 0 2.5 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(uuid "0e1a0cc4-bac9-458a-9c3d-7c5b87f695a1")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "2fe83bfe-db4a-4850-a542-d27ca74d45c0")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "43238c12-4004-47dd-8c7e-8ed348cf0835")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr smd)
+	(fp_rect
+		(start -7.5 -7)
+		(end 7.5 6.5)
+		(stroke
+			(width 0.2)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.SilkS")
+		(uuid "98182f15-aba9-4d19-82ee-83709a7a95c1")
+	)
+	(fp_rect
+		(start -7.8 -7.3)
+		(end 7.8 6.8)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(fill no)
+		(layer "F.CrtYd")
+		(uuid "c2e04a2e-91c7-48f5-a292-9ea5324c0c42")
+	)
+	(fp_text user "${REFERENCE}"
+		(at 0 4.5 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(uuid "aabdae5d-bf9d-402d-9a74-f4f81d92c361")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(pad "" smd rect
+		(at -6.75 -5.5)
+		(size 0.7 2.2)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(uuid "f9661411-99de-429e-ae3a-b42f84f75e38")
+	)
+	(pad "" smd rect
+		(at 0 -6.3)
+		(size 2.2 0.7)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(uuid "3f708b1a-27c2-4f42-aefc-f5e7d673c08c")
+	)
+	(pad "" smd rect
+		(at 6.75 -5.5)
+		(size 0.7 2.2)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(uuid "686acfb3-ff63-44b7-8b61-1aabfb346053")
+	)
+	(pad "1" smd circle
+		(at -1.3 -2.5)
+		(size 0.9 0.9)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(uuid "529b5d61-1316-4ffd-b60f-5f07a8f35962")
+	)
+	(pad "2" smd circle
+		(at -3.4 -2.5)
+		(size 0.9 0.9)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(uuid "8f866ee6-8207-411d-8e67-b74fd7870860")
+	)
+	(pad "3" smd circle
+		(at 3.4 -2.5)
+		(size 0.9 0.9)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(uuid "8a6b190f-b8a5-41bf-b665-93d056ada9af")
+	)
+	(pad "4" smd circle
+		(at -3.4 0)
+		(size 0.9 0.9)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(uuid "b724f75a-3400-4c29-bb6e-c90842523a4c")
+	)
+	(pad "5" smd circle
+		(at 3.4 0)
+		(size 0.9 0.9)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(uuid "64e95d89-77ac-4605-b419-55d239e308db")
+	)
+	(embedded_fonts no)
+)

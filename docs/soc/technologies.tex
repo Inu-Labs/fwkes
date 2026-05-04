@@ -1,0 +1,74 @@
+\chapter*{Použité technologie}
+\addcontentsline{toc}{chapter}{Použité technologie}
+
+Vzhledem k rozsahu projektu bylo využito široké spektrum technologií od nízkoúrovňového programování
+až po mechanický návrh. Výběr nástrojů reflektoval technické požadavky, dostupnost dokumentace a
+také preferenci otevřeného softwaru (\textit{FOSS}). Klíčové technologie jsou shrnuty v tabulce
+\ref{tab:technologies}.
+
+\begin{table}[htbp]
+    \centering
+    \small
+    % \renewcommand{\arraystretch}{0.75}
+    \begin{tabularx}{\textwidth}{l l >{\raggedright\arraybackslash}X}
+        \toprule
+        \textbf{Kategorie} & \textbf{Technologie} & \textbf{Využití v projektu} \\
+        \midrule
+
+        \textbf{Vývoj a sestavení}
+        & Jazyk C, GCC
+        & Hlavní implementační jazyk a kompilátor pro architekturu ARM (RP2350). \\
+        & CMake
+        & Automatizace sestavení, správa závislostí a multiplatformní podpora. \\
+        & Git
+        & Správa verzí, historie změn a synchronizace zdrojového kódu. \\
+        \addlinespace
+
+        \textbf{Emulace a BIOS}
+        & cc65
+        & Toolchain pro 6502; sestavení BIOSu a testovacích programů. \\
+        & neslib
+        & Vývoj UI BIOSu (práce s registry PPU, správa palet a textu). \\
+        & Unity
+        & Unit testing framework pro validaci implementace instrukcí CPU 6502. \\
+        \addlinespace
+
+        \textbf{Embedded systém}
+        & Pico SDK
+        & Oficiální abstrakční vrstva (HAL) pro nízkoúrovňové řízení RP2350. \\
+        & PicoDVI
+        & Softwarové generování DVI/HDMI signálu pomocí PIO a DMA. \\
+        & FatFS
+        & Implementace souborového systému FAT32 pro načítání dat z SD karty. \\
+        \addlinespace
+
+        \textbf{Hardware a kryty}
+        & KiCad
+        & Návrh schémat a desky plošných spojů (PCB) emulátoru. \\
+        & Fusion 360
+        & Konstrukce a 3D modelování mechanické schránky zařízení. \\
+        & PrusaSlicer
+        & Příprava dat (G-code) pro 3D tisk součástí krytu. \\
+        \addlinespace
+
+        \textbf{Desktop backend}
+        & SDL3
+        & Abstrakce grafiky, zvuku a vstupů pro ladění emulačního jádra na PC. \\
+        \addlinespace
+
+        \textbf{Dokumentace}
+        & {\fontfamily{cmr}\selectfont \hologo{LaTeX}}
+        & Sazba textu této práce. \\
+        & {\fontfamily{cmr}\selectfont \hologo{LuaLaTeX}}
+        & Kompilátor zdrojových souborů textové práce v sázecím systému
+        {\fontfamily{cmr}\selectfont \hologo{LaTeX}}. \\
+        & PlantUML
+        & Kreslení časových diagramů. \\
+        & draw.io
+        & Kreslení diagramů a ilustrací. \\
+
+        \bottomrule
+    \end{tabularx}
+    \caption{Přehled použitých technologií, knihoven a nástrojů.}
+    \label{tab:technologies}
+\end{table}

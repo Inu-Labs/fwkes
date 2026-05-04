@@ -1,0 +1,85 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.5.2 Chrome/142.0.7444.265 Electron/39.5.2 Safari/537.36" version="29.5.2">
+  <diagram name="Page-1" id="UDvUuWj-o2vA16uVVsVO">
+    <mxGraphModel dx="391" dy="551" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="hDUhVv0bzp48k7QuuBrO-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;strokeWidth=2;fontFamily=Linux Biolinum G;fontSize=14;" value="Grafika" vertex="1">
+          <mxGeometry height="40" width="120" x="200" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="hDUhVv0bzp48k7QuuBrO-2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;fontFamily=Linux Biolinum G;fontSize=14;" value="Vstup" vertex="1">
+          <mxGeometry height="40" width="80" x="320" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="hDUhVv0bzp48k7QuuBrO-4" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=2;fontFamily=Linux Biolinum G;fontSize=14;" value="RAM" vertex="1">
+          <mxGeometry height="40" width="80" x="120" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="hDUhVv0bzp48k7QuuBrO-5" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontFamily=Linux Biolinum G;fontSize=12;" value="$0000—$07FF" vertex="1">
+          <mxGeometry height="30" width="80" x="120" y="290" as="geometry" />
+        </mxCell>
+        <mxCell id="hDUhVv0bzp48k7QuuBrO-6" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontFamily=Linux Biolinum G;fontSize=12;" value="$2000—$2007" vertex="1">
+          <mxGeometry height="30" width="80" x="220" y="290" as="geometry" />
+        </mxCell>
+        <mxCell id="hDUhVv0bzp48k7QuuBrO-7" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontFamily=Linux Biolinum G;fontSize=12;" value="$4016—$4017" vertex="1">
+          <mxGeometry height="30" width="80" x="320" y="290" as="geometry" />
+        </mxCell>
+        <mxCell id="hDUhVv0bzp48k7QuuBrO-8" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=2;fontFamily=Linux Biolinum G;" value="Zvuk" vertex="1">
+          <mxGeometry height="40" width="80" x="400" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="hDUhVv0bzp48k7QuuBrO-9" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontFamily=Linux Biolinum G;fontSize=13;" value="$4000—$4017" vertex="1">
+          <mxGeometry height="30" width="80" x="400" y="290" as="geometry" />
+        </mxCell>
+        <mxCell id="hDUhVv0bzp48k7QuuBrO-10" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;horizontal=0;fontFamily=Linux Biolinum G;" value="CTRL" vertex="1">
+          <mxGeometry height="60" width="20" x="200" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="hDUhVv0bzp48k7QuuBrO-11" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;horizontal=0;fontFamily=Linux Biolinum G;" value="MASK" vertex="1">
+          <mxGeometry height="60" width="20" x="220" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="hDUhVv0bzp48k7QuuBrO-12" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;horizontal=0;fontFamily=Linux Biolinum G;" value="STATUS" vertex="1">
+          <mxGeometry height="60" width="20" x="240" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="hDUhVv0bzp48k7QuuBrO-13" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;horizontal=0;fontFamily=Linux Biolinum G;" value="ADDR" vertex="1">
+          <mxGeometry height="60" width="20" x="260" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="hDUhVv0bzp48k7QuuBrO-14" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;horizontal=0;fontFamily=Linux Biolinum G;" value="DATA" vertex="1">
+          <mxGeometry height="60" width="20" x="280" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="hDUhVv0bzp48k7QuuBrO-15" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#8E0020;fontColor=#ffffff;strokeColor=#6F0000;horizontal=0;verticalAlign=middle;fontFamily=Linux Biolinum G;" value=". . ." vertex="1">
+          <mxGeometry height="60" width="20" x="300" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="hDUhVv0bzp48k7QuuBrO-16" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1ba1e2;fontColor=#ffffff;strokeColor=#006EAF;horizontal=0;fontFamily=Linux Biolinum G;" value="OUT1" vertex="1">
+          <mxGeometry height="60" width="20" x="320" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="hDUhVv0bzp48k7QuuBrO-17" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1ba1e2;fontColor=#ffffff;strokeColor=#006EAF;horizontal=0;fontFamily=Linux Biolinum G;" value="OUT2" vertex="1">
+          <mxGeometry height="60" width="20" x="340" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="hDUhVv0bzp48k7QuuBrO-18" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1ba1e2;fontColor=#ffffff;strokeColor=#006EAF;horizontal=0;fontFamily=Linux Biolinum G;" value="CLK" vertex="1">
+          <mxGeometry height="60" width="20" x="360" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="hDUhVv0bzp48k7QuuBrO-19" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1ba1e2;fontColor=#ffffff;strokeColor=#006EAF;horizontal=0;fontFamily=Linux Biolinum G;" value="STROBE" vertex="1">
+          <mxGeometry height="60" width="20" x="380" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="hDUhVv0bzp48k7QuuBrO-20" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e3c800;fontColor=#000000;strokeColor=#B09500;horizontal=0;fontFamily=Linux Biolinum G;" value="PULSE" vertex="1">
+          <mxGeometry height="60" width="20" x="400" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="hDUhVv0bzp48k7QuuBrO-22" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e3c800;fontColor=#000000;strokeColor=#B09500;horizontal=0;fontFamily=Linux Biolinum G;" value="TRIANGLE" vertex="1">
+          <mxGeometry height="60" width="20" x="420" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="hDUhVv0bzp48k7QuuBrO-23" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e3c800;fontColor=#000000;strokeColor=#B09500;horizontal=0;fontFamily=Linux Biolinum G;" value="NOISE" vertex="1">
+          <mxGeometry height="60" width="20" x="440" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="hDUhVv0bzp48k7QuuBrO-24" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#C8B000;fontColor=#000000;strokeColor=#B09500;horizontal=0;fontFamily=Linux Biolinum G;" value=". . ." vertex="1">
+          <mxGeometry height="60" width="20" x="460" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="hDUhVv0bzp48k7QuuBrO-26" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#6d8764;fontColor=#ffffff;strokeColor=#3A5431;horizontal=0;fontFamily=Linux Biolinum G;" value="STACK" vertex="1">
+          <mxGeometry height="60" width="20" x="160" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="hDUhVv0bzp48k7QuuBrO-27" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#6d8764;fontColor=#ffffff;strokeColor=#3A5431;horizontal=0;fontFamily=Linux Biolinum G;" value="VECTORS" vertex="1">
+          <mxGeometry height="60" width="20" x="180" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="hDUhVv0bzp48k7QuuBrO-45" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#6d8764;fontColor=#ffffff;strokeColor=#3A5431;horizontal=0;fontFamily=Linux Biolinum G;" value="MEMORY" vertex="1">
+          <mxGeometry height="60" width="40" x="120" y="360" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

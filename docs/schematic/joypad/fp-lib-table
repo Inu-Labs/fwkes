@@ -1,0 +1,4 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "fwkes-footprints")(type "KiCad")(uri "/home/eax_ebx/projects/fwkes/docs/schematic/fwkes-footprints.pretty")(options "")(descr ""))
+)

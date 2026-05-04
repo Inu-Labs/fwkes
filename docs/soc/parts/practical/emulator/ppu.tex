@@ -1,0 +1,294 @@
+\section{PPU}
+
+% Architektura
+%   - struktura PPU
+%   - presna reprezentace vsech registru a pameti
+%   - vyuziti Loopyho modelu pro scrolling
+% IO/komunikace
+%   - ukazka ppu_write() a ppu_read() funkci
+%   - implementace OAM DMA
+% Rendrovani
+%   - ukazka ppu_run_until() funkce
+%     - pocitani cyklu
+%   - buferizovani pixelu
+%   - algoritmus fetchovani tilu (background a sprity)
+%     - LUT tabulky
+%   - algoritmus rendrovani backgroundu
+%     - realizace scrollingu
+%   - algoritmus rendrovani spritu
+%   - algoritmus scanu spritu
+
+Funkce \texttt{ppu\_run\_until} (viz výpis \ref{lst:ppu_run_until} aktualizuje stav PPU a posouvá ho
+po cyklové ose dokud nedožene stav CPU (parametr \texttt{target\_cycle}).
+
+\begin{listing}[htbp]
+\begin{minted}{c}
+void ppu_run_until(Ppu *self, CycleCounter target_cycle) {
+    while (self->cycles < target_cycle) {
+        unsigned cycles_rem = SCANLINE_END - self->dot;
+        unsigned cycles_to_run = target_cycle - self->cycles;
+        unsigned step =
+            (cycles_to_run < cycles_rem) ? cycles_to_run : cycles_rem;
+        unsigned prev_dot = self->dot;
+        unsigned next_dot = self->dot + step;
+
+        /* Aktualizace stavu PPU... */
+
+        self->cycles += step;
+        self->dot = next_dot;
+        /* Logika přechodu mezi scanline */
+        if (self->dot >= 341) {
+            /* inkrementace scanline, případné nastavení VBlank, ... */
+        }
+    }
+}
+\end{minted}
+\caption{Funkce pro aktualizaci stavu PPU, implementovaná pomocí catch-up mechanismu.}
+\label{lst:ppu_run_until}
+\end{listing}
+
+Namísto inkrementální emulace po jednotlivých tečkách využívá funkce \texttt{ppu\_run\_until}
+principu skoků k významným událostem v rámci řádku. Algoritmus vypočítá vzdálenost k nejbližšímu
+bodu zájmu (např. cyklus odpovídající cyklu CPU nebo konec řádku) a provede aktualizaci stavu v
+blocích. Tento přístup výrazně šetří instrukční cykly procesoru RP2350.
+
+\label{ppu_scanline_callback}
+Když PPU dokončí vykreslování řádku, vyvolá callback, kde cílový kód může přímo poslat řádek na
+displej nebo provést další operace. To dovoluje PPU být nezávislým na způsobu vykreslování na cílové
+architektuře. Pixely se vykreslují do vnitřního bufferu.
+
+\subsection{Vykreslování pozadí}
+
+Proces generování obrazu v emulátoru musí být velice efektivní, aby RP2350 dokázal udržet stabilní
+snímkovou frekvenci. Funkce \texttt{render\_bg} (výpis \ref{lst:render_bg}) realizuje vykreslování
+dlaždic pozadí s pixelovou granulací. Ačkoliv se data z paměti čtou po řádcích dlaždic (8 pixelů),
+samotný zápis do bufferu \texttt{scanline\_buf} může probíhat po blocích. Tento přístup je také
+nezbytný pro správnou realizaci jemného horizontálního posunu (\textit{fine X scrolling}).
+
+\begin{listing}[htbp]
+\begin{minted}{c}
+void render_bg(Ppu *self, unsigned start, unsigned end) {
+    unsigned curr = start;
+    /* Výpočet počátečního offsetu v rámci první dlaždice */
+    unsigned offset = (curr + self->x) & 7;
+    uint8_t *dest = &self->scanline_buf[curr];
+    while (curr < end) {
+        /* Výpočet úseku, který zbývá vykreslit v aktuální dlaždici */
+        unsigned rem = 8 - offset;
+        unsigned count = (rem > (end - curr)) ? (end - curr) : rem;
+        /* Načtení dat dlaždice a atributů z pamětí */
+        TileRow tile = fetch_tile(self);
+        /* Bitový posun pro zarovnání pixelů podle jemného X posunu */
+        tile >>= (offset << 2);
+        /* Vnitřní smyčka pro zápis pixelů */
+        for (unsigned i = 0; i < count; ++i) {
+            *dest++ = tile & 0x0f; /* zápis 4bitové barvy */
+            tile >>= 4;
+            ++curr;
+        }
+        /* Další dlaždice již začínají od nultého pixelu */
+        offset = 0;
+        /* Kontrola přechodu na další dlaždici (hrubý X posun) */
+        if (!((curr + self->x) & 7)) {
+            increment_coarse_x(self);
+        }
+    }
+}
+\end{minted}
+\caption{Funkce pro vykreslování dlaždicových řádku pozadí.}
+\label{lst:render_bg}
+\end{listing}
+
+V rámci implementace byly použity tři klíčové optimalizační techniky:
+
+\begin{itemize}
+    \item Logika jemného posunu je integrována přímo do kódu vykreslování pomocí bitových posunů.
+        Tím odpadá nutnost dodatečného ořezávání a posunu obrazu.
+    \item V kritické smyčce \texttt{for}, která zapisuje pixely do \texttt{scanline\_buf}, se využívá
+        pointerová aritmetika (\texttt{*dest++}) namísto přímého indexování pole pomocí \texttt{curr}.
+        Slouží to jako optimalizační nápověda pro kompilátor, aby efektivněji využil registry a
+        instrukce procesoru RP2350. Tím odpadává nutnost opětovného výpočtu adresy v každé iteraci
+        smyčky.
+    \item „Balení“ řádku dlaždice ve 32bitovém typu: tradiční reprezentace barev pomocí RGB v NES je
+        pro moderní procesory nevýhodná. Byla využita technika balení osmi pixelů do jedné 32bitové
+        proměnné (typ \texttt{TileRow}). Každý 4bitový nibble v této proměnné nese kompletní
+        informaci o indexu palety i barvy daného pixelu. To umožňuje provádět jemný horizontální
+        posun pomocí jediného bitového posunu nad celým registrem, namísto osmi samostatných
+        operací. Funkce \texttt{fetch\_tile()}, která balí jeden řádek dlaždice do 32bitového typu,
+        bude popsáná v další sekcí.
+\end{itemize}
+
+\subsection{Příprava dat pro vykreslování pozadí}
+
+Funkce \texttt{fetch\_tile()} (výpis \ref{lst:fetch_tile}) slouží k načtení celé dlaždice z VRAM
+podle adresy, nastavené interním 16bitovým registrem \texttt{v}.
+
+\begin{listing}[htbp]
+\begin{minted}{c}
+TileRow fetch_tile(const Ppu *self) {
+    uint16_t v = self->v; /* Aktuální adresní registr */
+    /* 1. Výpočet adresy a načtení indexu dlaždice z Name Table */
+    uint16_t addr = PPU_NT0 | (v & (VRAM_COARSE_X | VRAM_COARSE_Y | VRAM_NT_SEL));
+    uint8_t tile_idx = self->nt[(addr >> 10) & 3][addr & 0x3ff];
+    /* 2. Načtení atributů pro danou oblast */
+    uint16_t attr_addr = calc_attr_addr(v);
+    uint8_t attr = self->nt[(attr_addr >> 10) & 3][attr_addr & 0x3ff];
+    /* 3. Výpočet posunu pro extrakci 2 bitů palety z bajtu atributů */
+    unsigned shift = ((v >> 4) & 4) | (v & 2);
+    uint8_t palette_idx = (attr >> shift) & 3;
+    /* 4. Adresace Pattern Table a načtení dvou bitových rovin */
+    uint16_t row_addr = get_pattern_table_bg(self) +
+        (tile_idx << 4) + vram_get_fine_y(v);
+    uint8_t row_low = self->chr[row_addr];
+    uint8_t row_high = self->chr[row_addr + 8];
+    /* 5. Syntéza 32bitového slova pomocí předpočítaných tabulek (LUT).
+     * Transformace bitových rovin na rozprostřenou masku pixelů */
+    uint32_t raw_pixels = row_high_lut[row_high] | row_low_lut[row_low];
+    /* Aplikace indexu palety na všechny pixely v bloku */
+    uint32_t attr_mask = attr_mask_lut[palette_idx];
+    /* 6. Zabalení řádku do 32bitového typu TileRow (8 pixelů po 4 bitech) */
+    return raw_pixels | attr_mask;
+}
+\end{minted}
+\caption{Extrakce řádku dlaždice a následná jeho syntézu do 32bitového typu \texttt{TileRow} pomocí
+LUT.}
+\label{lst:fetch_tile}
+\end{listing}
+
+Jak je patrné, využití LUT tabulek v této funkcí slouží k úplnému zamezení redundantním výpočtům v
+kritické cestě emulátoru. Namísto procesorově náročné manipulace s jednotlivými pixely je
+transformace grafických dat redukována na několik operací čtení z paměti a bitových operací.
+
+\subsection{Vykreslování spritů}
+
+Po vykreslení bloku pixelů pozadí, proběhne algoritmus vykreslování spritů, který pracuje s
+jednotlivými sprity na řádku (pokud jsou, nebo vykreslování spritů je zapnuto). Funkce
+\texttt{render\_sprites} (viz výpis \ref{lst:render_sprites}) iteruje frontu spritů, řeší Sprite 0
+Hit a prioritu vůči pozadí. Výsledné pixely zapisuje do \texttt{scanline\_buf}.
+
+\begin{listing}[htbp]
+\begin{minted}{c}
+for (unsigned x = draw_start; x < draw_end; ++x) {
+    uint8_t px = tile & 0x0f; /* Pixel spritu */
+    uint8_t bg_px = *dest & 0x0f; /* Existující pixel pozadí v bufferu */
+    bool bg_opaque = (bg_px & 0x03) != 0;
+    /* 2. Je pixel spritu neprůhledný? */
+    if ((px & 0x03) != 0) {
+        /* 3. Detekce kolize pro Sprite 0 Hit */
+        if (spr->is_0 && bg_opaque && x < 255) {
+            self->stat |= PPU_STAT_ZERO_HIT;
+        }
+        /* 4. Zápis pixelu při splnění prioritních podmínek */
+        if (!behind_bg || !bg_opaque) {
+            /* Bit 4 značí, že jde o pixel (relevantní
+             * při finálním vykreslování na obrazovku) */
+            *dest = px | 0x10;
+        }
+    }
+
+    ++dest;
+    tile >>= 4;
+}
+\end{minted}
+\caption{Kód pro vykreslení spritu s řešením priority pořadí, Sprite 0 Hit a průhledností.}
+\label{lst:render_sprites}
+\end{listing}
+
+Tato funkce řeší několik důležitých aspektu hardwaru NES:
+
+\begin{enumerate}
+    \item Sprity jsou prohledávány v opačném pořadí -- od nejnižší priority k nejvyšší.
+    \item Je respektována průhlednost pixelů spritu -- pokud pixel spritu je průhledný, pixel v
+        bufferu nebude ovlivněn.
+    \item Pokud se vykresluje první v pořadí sprite, pixel pozadí není průhledný a přitom pixel
+        spritu není 255. pixel, nastane podmínka Sprite 0 Hit a příslušný bit v \texttt{PPUSTAT}
+        bude nastaven (který pak přečte emulovaný program a zjistí, zda Sprite 0 Hit skutečně
+        nastal).
+    \item Aby výsledný pixel spritu byl zapsán do bufferu, musí být vepředu (6. bit atributu
+        spritu má být vypnut). Pokud není vepředu (odpovídající bit je zapnut), a přitom pixel
+        pozadí není průhledný, pixel spritu bude zahozen.
+\end{enumerate}
+
+\subsection{Příprava dat pro vykreslování spritů}
+
+Princip funkce \texttt{fetch\_spr\_tile()} pro přípravu řádku dlaždice spritu pro vykreslování je
+stejný jako v případě řádku dlaždice pozadí. Vzhledem k tomu, že většina potřebné informace je již
+zakódována v OAM, výsledný algoritmus je značně jednodušší. Tato funkce je také založena na balení
+celého řádku dlaždice do 32bitového typu \texttt{TileRow} podobně jako \texttt{fetch\_spr\_tile()}, a
+aktivně využívá LUT tabulky, zejména pro převracené řádky pixely, pokud je horizontální převracení
+zapnuto.
+
+Z důvodu zjednodušení se neřeší clipping. Toto však nemá zásadní vliv na základní funkčnost
+emulátoru.
+
+\subsection{Prohledávání OAM (Sprite Evaluation)}
+
+Jak bylo zmíněno v podkapitole \ref{tp:sprite-eval}, systém NES dokáže na jednom řádku zobrazit
+maximálně 8 spritů, a je nutné před samotným vykreslováním provést jejich výběr. Funkce
+\texttt{queue\_sprites} (výpis \ref{lst:queue_sprites}) prochází paměť OAM a identifikuje objekty,
+které protínají aktuálně emulovaný scanline.
+
+\begin{listing}[htbp]
+\begin{minted}{c}
+for (unsigned i = 0; i < 64 && self->queued_sprites_count < 8; ++i) {
+    uint8_t y = self->oam[i * 4];
+    if (y >= 239) continue; /* Sprite mimo viditelnou oblast */
+
+    unsigned row = self->scanline - y;
+    if (row < h) { /* Sprite protíná aktuální řádek */
+        Sprite *spr = &self->queued_sprites[self->queued_sprites_count];
+        uint8_t tile = self->oam[i * 4 + 1];
+        uint8_t attr = self->oam[i * 4 + 2];
+        uint16_t pat_addr;
+
+        spr->pos_y = y;
+        spr->pos_x = self->oam[i * 4 + 3];
+        spr->attr = attr;
+        spr->is_0 = (i == 0); /* Důležité pro detekci Sprite 0 Hit */
+
+        /* Výpočet jemné Y souřadnice s ohledem na vertikální převrácení */
+        unsigned y_fine = (attr & 0x80) ? (h - 1 - row) : row;
+
+        /* Výpočet adresy v Pattern Table */
+        if (h == 8) { /* Režim 8x8 */
+            uint16_t base = get_pattern_table_spr(self);
+            pat_addr = base + (tile * 16) + y_fine;
+        } else { /* Režim 8x16 (bit 0 určuje banku, zbytek index) */
+            uint16_t base = (tile & 1) ? 0x1000 : 0x0000;
+            uint8_t tile_idx = tile & 0xfe;
+            if (y_fine >= 8) {
+                ++tile_idx;
+                y_fine -= 8;
+            }
+            pat_addr = base + (tile_idx * 16) + y_fine;
+        }
+
+        /* Přednačtení dat dlaždice pomocí LUT (stejně jako u pozadí) */
+        spr->tile = fetch_spr_tile(self, pat_addr, attr);
+        ++self->queued_sprites_count;
+    }
+\end{minted}
+\caption{Implementace Sprite Evaluation. Funkce připravuje data pro 8 objektů na aktuálním řádku.}
+\label{lst:queue_sprites}
+\end{listing}
+
+\newpage
+
+Klíčové aspekty implementace:
+
+\begin{itemize}
+    \item Smyčka prochází všech 64 spritů (256 bytů) v pamětí OAM, ale ukončí se ihned po nalezení
+        prvních osmi platných objektů. Tim je emulován limit původního hardwaru a zároveň šetřen
+        procesorový čas mikrokontroléru.
+    \item Tato implementace bere v povahu to, že systém NES měl sprity posunute o jeden pixel (viz
+        \ref{tp:sprite-eval}).
+    \item Funkce dynamicky přepíná mezi standardním režimem 8\texttimes8 a rozšířeným 8\texttimes16
+        podle registru \texttt{PPU\_CTRL}. V režimu 8\texttimes16 funguje adresování
+        odlišně -- nultý bit indexu dlaždice slouží jako volič banky (Pattern Table), zatímco
+        zbylé bity určují konkrétní dvojici dlaždic.
+    \item Pokud je v atributech nastaven příznak pro vertikální převracení (0x80), index řádku
+        uvnitř dlaždice se invertuje. Tato operace probíhá před výpočtem adresy v CHR pamětí (pokud
+        by převracení se aplikovalo při vykreslování, značně by to zkomplikovalo algoritmus a také
+        výpočetní výkon).
+\end{itemize}
+

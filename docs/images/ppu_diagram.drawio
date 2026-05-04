@@ -1,0 +1,31 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.3.0 Chrome/140.0.7339.249 Electron/38.7.2 Safari/537.36" version="29.3.0">
+  <diagram name="Page-1" id="_7py-6wbjpNKOohPmK2p">
+    <mxGraphModel dx="838" dy="566" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="ILV4KTd2p9Lf8UPJV2eh-2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="V&lt;div&gt;VRAM addr&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="80" x="240" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="ILV4KTd2p9Lf8UPJV2eh-3" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="T&lt;div&gt;Temp reg&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="80" x="240" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="ILV4KTd2p9Lf8UPJV2eh-4" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="X&lt;div&gt;Fine X&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="80" x="240" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="ILV4KTd2p9Lf8UPJV2eh-5" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="W&lt;div&gt;Write latch&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="80" x="240" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="ILV4KTd2p9Lf8UPJV2eh-6" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Mask reg" vertex="1">
+          <mxGeometry height="40" width="80" x="360" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="ILV4KTd2p9Lf8UPJV2eh-7" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Ctrl reg" vertex="1">
+          <mxGeometry height="40" width="80" x="360" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="ILV4KTd2p9Lf8UPJV2eh-8" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="OAM" vertex="1">
+          <mxGeometry height="60" width="120" x="480" y="240" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

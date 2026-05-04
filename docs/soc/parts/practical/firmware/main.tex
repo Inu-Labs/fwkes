@@ -1,0 +1,53 @@
+\chapter{Návrh firmwaru}
+
+Firmware představuje softwarovou vrstvu, která propojuje jádro emulátoru s reálným hardwarem
+zařízení. Stejně jako samotný emulátor, firmware byl realizován v jazyce C, a to s využitím vývojové
+sady pico-sdk.
+
+Hlavním úkolem firmwaru je správa běhu emulátoru, zajištění plynulého video a audio výstupu a
+obsluha vstupních herních ovladačů. Dále implementuje podporu souborového systému FAT pro čtení a
+zápis na SD kartu, což umožňuje práci se soubory jak samotnému firmwaru, tak emulovanému systému
+(prostřednictvím rozhraní FWX).
+
+\begin{listing}[htbp]
+\begin{minted}{c}
+while (true) {
+    /* Přečtení vstupu */
+    update_joypads(&self->bus.joypad1, &self->bus.joypad2);
+    /* Reset přerušení se nemá stat v okamžik zpracování
+     * požadavku o resetování */
+    disable_interrupts();
+    /* Zpracování požadavku na obnovení výchozího stavu emulátoru */
+    if (self->reset_required) {
+        BusEvent new_ev = {
+            .id = BUS_EVENT_RESET,
+        };
+
+        bus_add_event(&self->bus, &new_ev);
+        self->reset_required = false;
+    }
+
+    enable_interrupts();
+    /* Zpracování čekajících událostí na sběrnici */
+    bus_update(&self->bus);
+    /* Krok emulační smyčky (vykreslení jednoho snímku) */
+    run_frame(self);
+}
+\end{minted}
+\caption{Hlavní smyčka programu firmwaru.}
+\label{lst:main_loop}
+\end{listing}
+
+Ve výpisu \ref{lst:main_loop} je uveden kód hlavní smyčky firmwaru. V každé iteraci mikrokontrolér
+přečte aktuální stav ovladačů a provede emulaci jednoho úplného snímku obrazu. Před samotnou emulací
+snímku jsou zpracovány veškeré události nashromážděné od předchozího cyklu (například požadavek na
+načtení nového programu z SD karty). Běh emulace je primárně synchronizován s tokem audio signálu
+(viz podkapitola \ref{pp:audio}), což zajišťuje stabilní rychlost 60 snímků za sekundu.
+
+Stisknutí resetovacího tlačítka na základní desce je obsluhováno asynchronně pomocí
+hardwarového přerušení. Toto přerušení pouze nastaví příznak \texttt{reset\_required} na hodnotu
+\texttt{true}. Díky tomuto přístupu nemusí hlavní program v každém cyklu aktivně číst stav pinu
+(tzv. \textit{polling}), čímž se šetří cenné procesorové instrukce a vymezuje situaci, když
+stisknutí nebylo zaregistrováno.
+
+Z rychlostních důvodu, RP2350 je přetaktován (\textit{overclocked}) z původních 150 MHz na 300 MHz.

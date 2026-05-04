@@ -1,0 +1,18 @@
+[submodule "third-party/ImGuiFileDialog"]
+	path = third-party/ImGuiFileDialog
+	url = https://github.com/aiekick/ImGuiFileDialog.git
+[submodule "third-party/imgui_club"]
+	path = third-party/imgui_club
+	url = https://github.com/ocornut/imgui_club.git
+[submodule "third-party/imgui"]
+	path = third-party/imgui
+	url = https://github.com/ocornut/imgui.git
+[submodule "third-party/PicoDVI"]
+	path = third-party/PicoDVI
+	url = https://github.com/Wren6991/PicoDVI.git
+[submodule "third-party/Unity"]
+	path = third-party/Unity
+	url = https://github.com/ThrowTheSwitch/Unity.git
+[submodule "third-party/lwmem"]
+	path = third-party/lwmem
+	url = https://github.com/MaJerle/lwmem.git

@@ -1,0 +1,205 @@
+\section{Generace audio výstupu}
+\label{pp:audio}
+
+V podkapitole \ref{sec:dac} bylo zmíněno, že pro generaci audio signálu z výstupu APU je využívána
+pulsně šířková modulace (PWM) pro aproximaci audio signálu v digitální doméně. Naše řešení kromě PWM
+také využívá technologii DMA pro synchronní a stabilní přenos vzorku podle vzorkovací frekvence.
+
+\subsection{Konfigurace PWM}
+\label{sub:pwm_configuration}
+
+Pro dosažení kvalitního a stabilního zvukového výstupu je nezbytné zajistit, aby byly jednotlivé
+vzorky odesílány do PWM generátoru přesně v rytmu vzorkovací frekvence $f_s$. Jakákoliv softwarová
+nepravidelnost (tzv. \textit{jitter}) by se projevila jako slyšitelné zkreslení (trhaní zvuku,
+zasekávání atd.). Z tohoto důvodu byla zvolena plně hardwarová cesta využívající řetězení kanálů
+DMA, díky čemuž procesor věnuje tomu minimální svůj čas a je menší šance desynchronizace.
+
+Nejprvé je nutné odvodit parametry PWM z frekvence systémových hodin $f_{\cmrtext{clk}}$. Pro
+dosažení optimální filtrace v analogové části obvodu byla zvolena
+nosná frekvence PWM $f_{\cmrtext{PWM}} = \SI{250}{\kilo\hertz}$. Vzorkovací frekvence emulátoru je
+pevně dána na $f_s = \SI{31.25}{\kilo\hertz}$. Z toho vyplývá, že na každý jeden audio vzorek
+připadá přesně 8 celých PWM cyklů:
+
+$$
+\frac{f_{\text{PWM}}}{f_s} = \frac{250000}{31250} = 8
+$$
+
+Nosná Frekvence PWM byla zvolena jako celočíselný násobek vzorkovací frekvence , aby bylo zajištěno
+deterministické a periodické časování mezi aktualizací střídy PWM a jednotlivými vzorky audio
+signálu. Tím je zaručeno, že každý vzorek je reprezentován konstantním počtem period PWM, což
+eliminuje časovou nekonzistenci při přepisu hodnot (jitter) a zabraňuje vzniku nízkofrekvenčních
+artefaktů způsobených nesynchronním vzorkováním. V případě neceločíselného poměru by docházelo k
+postupnému fázovému driftu mezi PWM signálem a generováním vzorků, což by vedlo k periodickému
+kolísání efektivní šířky pulzu a degradaci kvality rekonstruovaného analogového signálu.
+
+Klíčovým parametrem PWM je hodnota stropu čítače (TOP), která definuje maximální rozlišení (bitovou
+hloubku) výstupního signálu, závislé na počtu možných stavu stropu čítače TOP:
+
+$$
+\cmrtext{bitová hloubka} = \log_2(\cmrtext{TOP} + 1)
+$$
+
+Vztah pro výpočet frekvence PWM v mikrokontroléru RP2350 je definován jako:
+
+$$
+f_\cmrtext{PWM} = \frac{f_\cmrtext{clk}}{\cmrtext{clkdiv} \cdot (\cmrtext{TOP} + 1)}
+$$
+
+Jelikož nosní frekvenci PWM $f_\cmrtext{PWM}$ máme vybranou a taktovací frekvenci RP2350
+$f_\cmrtext{clk}$ známe, potřebujeme vypočítat optimální hodnotu pro strop čítače TOP. Po
+přeskládaní rovnice a dosazení hodnot získáváme:
+
+$$
+\cmrtext{TOP} = \frac{f_\cmrtext{clk}}{f_\cmrtext{PWM}} - 1 = \frac{300 \cdot 10^6}{250 \cdot 10^3} - 1 = 1200 - 1 = 1199
+$$
+
+Rozlišení PWM výstupu je tedy 1200 úrovní (včetně 0). Bitovou hloubku získáme hodnotu přibližně 10,2
+bitů ($\log_2(1200) \approx 10,2$). Ačkoliv moderní audio systémy využívají 16bitové nebo 24bitové
+rozlišení, pro reprodukci 8bitového zvuku z konzole NES je 10bitová hloubka více než dostatečná.
+
+Jelikož APU generuje 16bitové vzorky (v rozsahu 0 až 65535), je nutné je před odesláním do
+komparátoru přemapovat na rozsah čítače (0 až 1199):
+
+$$
+\cmrtext{hodnota} = \left\lfloor{\frac{\cmrtext{vzorek} \cdot \cmrtext{TOP}}{65535}}\right\rfloor
+$$
+
+Funkce \texttt{init\_pwm()} ve výpisu \ref{lst:pwm_init} provádí konfiguraci a inicializaci PWM
+podle výše uvedených informací.
+
+\begin{listing}[htbp]
+\begin{minted}{c}
+/* Konvertace vzorku na hodnotu čítače. Přetypování na uint32_t
+ * je zapotřebí, pokud výsledek násobení bude větší než 65535. */
+#define PWM_VALUE(smp) \
+    ((uint16_t) ((((uint32_t) (smp) * g_pwm_wrap) / 65535)))
+
+#define PWM_FREQ 250000
+
+static unsigned g_pwm_slice; /* číslo slicu */
+static uint16_t g_pwm_wrap; /* TOP */
+
+void init_pwm(void) {
+    /* Nastavení pinu jako výstup PWM */
+    gpio_set_function(APU_OUT_PIN, GPIO_FUNC_PWM);
+
+    g_pwm_slice = pwm_gpio_to_slice_num(APU_OUT_PIN);
+
+    /* Výpočet TOP (wrap v terminologii RP2350) */
+    unsigned sys_clk = clock_get_hz(clk_sys);
+    g_pwm_wrap = sys_clk / PWM_FREQ - 1;
+    /* Inicializace PWM */
+    pwm_set_wrap(g_pwm_slice, g_pwm_wrap);
+    pwm_set_clkdiv(g_pwm_slice, 1.f); /* dělička je 1 */
+    pwm_set_enabled(g_pwm_slice, true);
+}
+\end{minted}
+\caption{Inicializace a konfigurace PWM.}
+\label{lst:pwm_init}
+\end{listing}
+
+\subsection{Architektura DMA přenosu}
+
+Aby byl zajištěn nepřerušený tok dat, je využit mechanismus dvojitého bufferování, známý také jako
+\textbf{ping-pong buffer}\cite{pingpong-buf}. Paměťový prostor pro vzorky je rozdělen do dvou polí.
+Zatímco emulátor plní novými daty jeden buffer, DMA řadič čte data z druhého bufferu a posílá
+je do PWM komparátoru.
+
+\newpage
+
+K řízení tohoto procesu jsou zapotřebí dva DMA kanály (obr. \ref{fig:dma_channels}):
+
+\begin{enumerate}
+    \item \textbf{Audio kanál} -- tento kanál je zodpovědný za přenos samotných vzorků (16bitových
+        hodnot) z aktuálního bufferu přímo do hardwarového registru PWM komparátoru. Přenos jednoho
+        vzorku je spouštěn speciálním DMA časovačem, který je nastaven přesně na vzorkovací
+        frekvenci $f_s = \SI{31.25}{\kilo\hertz}$.
+    \item \textbf{Řídicí kanál} -- jakmile audio kanál vyprázdní aktuální buffer, automaticky spustí
+        tento řídicí kanál. Jeho jediným úkolem je přepsat zdrojovou adresu audio kanálu na adresu
+        druhého bufferu. Následně řídicí kanál opětovně spustí audio kanál, čímž se cyklus uzavírá
+        do nekonečné smyčky.
+\end{enumerate}
+
+Tento řetězený přístup zaručuje, že nedochází k žádnému softwarovému zpoždění při přepínání bufferů.
+Alternativným řešením by bylo zaregistrovat přerušení, které by se vyvolalo když jediný DMA audio
+kanál dokončí přenos dat. Ve vývoji se ale ukázalo, že to naopak způsobuje zpomalení procesoru, čímž
+je ovlivněna plynulost běhu emulaci, a také vyvolává trhání zvuku.
+
+\begin{figure}[htbp]
+    \centering
+    \includesvg[width=0.75\textwidth]{images/dma_channels.svg}
+    \caption{Blokové schéma principu dvou DMA kanálu: audio kanál a řídicí kanál.}
+    \label{fig:dma_channels}
+\end{figure}
+
+\subsection{Konfigurace DMA}
+
+Teoretický koncept ping-pong bufferu a řetězení kanálů je v realizován pomocí sady funkcí pico-sdk.
+
+Při inicializaci DMA, je nutné nastavit frekvenci DMA časovače $f_\cmrtext{DMA}$ na potřebnou.
+Obecný vztah pro $f_\cmrtext{DMA}$ platí:
+
+$$
+f_\cmrtext{DMA} = f_\cmrtext{clk} \frac{n}{d}
+$$
+
+V našem případě chceme docílit toho, aby frekvence časovače DMA se rovnala vzorkovací frekvenci,
+takže potřebujeme se zbavit členu $f_\cmrtext{clk}$ z rovnice. Když dosadíme $n = f_s$ a $d =
+f_\cmrtext{DMA}$, dostaneme:
+
+$$
+f_\cmrtext{DMA} = f_\cmrtext{clk} \frac{n}{d} = 300 \cdot 10^6 \cdot \frac{3,125 \cdot 10^4}{300
+\cdot 10^6} = \SI{31,25}{kHz}
+$$
+
+Knihovna pico-sdk poskytuje funkci \texttt{dma\_timer\_set\_fraction(timer, n, d)} pro nastavení
+frekvence DMA časovače. Jelikož je ale taktovací frekvence jádra 300 MHz, tato hodnota přesahuje
+maximální limit 16bitového dělitele. Problém byl vyřešen zkrácením zlomku na poměr
+$\frac{1}{9600}$, což přesně odpovídá požadovaným 31,25 kHz.
+
+\subsection{Generace vzorků}
+
+Zápis vzorků do správného bufferu zajišťuje funkce \texttt{audio\_queue()} (výpis
+\ref{lst:dma_queue}). Pokaždé když APU vygeneruje nový vzorek, je tato funkce zavolána. Jakmile
+dojde k naplnění aktuálního bufferu, musí se přejít na další buffer.
+
+Tato funkce také zajišťuje synchronizaci v okamžiku, když CPU zaplní buffer a chce přepnout se na
+další: CPU zkontroluje hardwarový registr \texttt{read\_addr} DMA řadiče. Pokud DMA stále čte z
+druhého bufferu, znamená to, že CPU emuluje systém rychleji, než probíhá reálné přehrávání zvuku.
+Procesor se proto zablokuje ve smyčce \texttt{tight\_loop\_counter()}, dokud se buffer neuvolní.
+Tímto způsobem emulátor se také synchronizuje se zvukem a udržuje stabilní rychlost běhu bez
+nutností využití softwarových časovačů.
+
+\begin{listing}[htbp]
+\begin{minted}{c}
+void audio_queue(ApuSample smp) {
+    /* Přemapování 16bitového vzorku na rozlišení PWM a zápis do bufferu */
+    g_bufs[g_curr_buf_idx][g_buf_pos++] = PWM_VALUE(smp);
+
+    /* Pokud je aktuální buffer plný, připravíme se na přepnutí */
+    if (g_buf_pos >= AUDIO_BUFFER_SIZE) {
+        unsigned next_buf_idx = (g_curr_buf_idx + 1) & (RING_SIZE - 1);
+
+        for (;;) {
+            /* Získání aktuální adresy, ze které DMA právě čte */
+            uintptr_t dma_addr = dma_hw->ch[g_audio_chan].read_addr;
+            uintptr_t next_buf_start = (uintptr_t) g_bufs[next_buf_idx];
+            uintptr_t next_buf_end = next_buf_start + sizeof(g_bufs[0]);
+
+            /* Pokud DMA už z dalšího bufferu nečte, můžeme smyčku opustit */
+            if (dma_addr < next_buf_start || dma_addr >= next_buf_end)
+                break;
+
+            /* Emulátor běží příliš rychle, CPU musí počkat na hardware audia */
+            tight_loop_contents();
+        }
+
+        /* Přepnutí indexů pro další dávku vzorků */
+        g_curr_buf_idx = next_buf_idx;
+        g_buf_pos = 0;
+    }
+}
+\end{minted}
+\caption{Ukládání vzorku do fronty (volného bufferu).}
+\label{lst:dma_queue}
+\end{listing}

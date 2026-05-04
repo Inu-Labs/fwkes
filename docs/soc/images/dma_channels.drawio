@@ -1,0 +1,39 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.5.2 Chrome/142.0.7444.265 Electron/39.5.2 Safari/537.36" version="29.5.2">
+  <diagram name="Page-1" id="mx2juq08uDlXUkCg6iXz">
+    <mxGraphModel dx="983" dy="616" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="cMORzo3snRuzaHB5Ev11-6" edge="1" parent="1" source="cMORzo3snRuzaHB5Ev11-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;fontFamily=Linux Biolinum G;fontSize=12;convertToSvg=0;" target="cMORzo3snRuzaHB5Ev11-2" value="Audio kanál vyprazdní buffer">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="300" y="320" />
+              <mxPoint x="490" y="320" />
+            </Array>
+            <mxPoint x="330" y="320" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="cMORzo3snRuzaHB5Ev11-1" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#f8cecc;strokeColor=#b85450;align=center;fontFamily=Linux Biolinum G;convertToSvg=0;" value="&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&lt;b&gt;DMA&lt;/b&gt;&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;b&gt;Audio kanál&lt;/b&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;Posílá vzorky z bufferu do registru komparátoru PWM&lt;/div&gt;" vertex="1">
+          <mxGeometry height="120" width="120" x="240" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="cMORzo3snRuzaHB5Ev11-9" edge="1" parent="1" source="cMORzo3snRuzaHB5Ev11-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=12;fontFamily=Linux Biolinum G;convertToSvg=0;" target="cMORzo3snRuzaHB5Ev11-1" value="Spustí audio kanál,&lt;div&gt;ale s dalším bufferem&lt;/div&gt;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="490" y="120" />
+              <mxPoint x="300" y="120" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="cMORzo3snRuzaHB5Ev11-2" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#f8cecc;strokeColor=#b85450;fontFamily=Linux Biolinum G;fontSize=12;convertToSvg=0;" value="&lt;b&gt;DMA&lt;/b&gt;&lt;div&gt;&lt;b&gt;Řídicí kanál&lt;/b&gt;&lt;/div&gt;&lt;div&gt;Restartuje audio kanál, když ten vyprazdní současný buffer&lt;/div&gt;" vertex="1">
+          <mxGeometry height="120" width="120" x="430" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="cMORzo3snRuzaHB5Ev11-5" edge="1" parent="1" source="cMORzo3snRuzaHB5Ev11-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontFamily=Linux Biolinum G;convertToSvg=0;" target="cMORzo3snRuzaHB5Ev11-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cMORzo3snRuzaHB5Ev11-3" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#647687;fontColor=#FFFFFF;strokeColor=#314354;fontFamily=Linux Biolinum G;labelBackgroundColor=none;labelBorderColor=none;convertToSvg=1;" value="DMA časovač&lt;div&gt;(31,25 kHz)&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="80" x="120" y="200" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

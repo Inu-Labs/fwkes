@@ -1,0 +1,62 @@
+\section{CPU}
+
+% - struktura CPU
+% - pouziti uint8_t, uint16_t, ..., pro reprezentaci registru (platí pro celou architekturu)
+% - typ CycleCounter - jeden z rysu cross-platformu
+% - CPU je implementován jako interpret
+% - ukazka implementace instrukci
+% - jakym zpusobem jsou implementovany adresovaci rezimy
+% - pocitani cyklu
+
+Pro reprezentaci registrů a adresaci pamětí se používají datové typy s fixní
+délkou~--~\texttt{uint8\_t}, \texttt{uint16\_t}, \dots, které jsou dostupné v hlavičkovém souboru
+\texttt{stdint.h}. Nejen to pomáhá šetřit paměť, ale také přispívá k dokumentaci kódu.
+
+Pro počítání cyklů se používá beznamínkový celočíselný datový typ \texttt{CycleCounter}, velikost
+kterého závisí na cílové architektuře -- v případě RP2350 je to \texttt{uint32\_t}, zatímco
+desktopový backend (architektura x86\_64) používá \texttt{uint64\_t}. Velikostí těchto typů
+odpovídají velikosti slova zmíněných architektur.
+
+\subsection{Vykonávací středisko CPU}
+
+CPU byl implementován jako interpret, jelikož procesor v NESu je poměrně jednoduchý a běží na
+taktovací frekvenci cca 1,7 MHz. Interpret je realizován na bázi podmínečné konstrukce
+\texttt{switch} (výpis \ref{lst:cpu_step}).
+
+\begin{listing}[htbp]
+\begin{minted}{c}
+void cpu_step(Cpu *self) {
+    if (self->nmi_pending) {
+        cpu_handle_nmi(self);
+        return;
+    }
+    /* Fetch a decode fáze */
+    uint8_t opcode = read(self, self->PC++);
+    uint16_t op_addr = decode(self, mode_table[opcode]);
+    /* Execute fáze (interpret) */
+    switch (opcode) {
+    case OPCODE_AND_IMM:
+        uint8_t data = read(self, op_addr);
+        self->A &= data;
+        SETZ(self->A == 0);
+        SETN(self->A & 0x80);
+        break;
+    /* Zbytek instrukcí byl zkrácen... */
+    }
+}
+\end{minted}
+\caption{Krokovací funkce CPU.}
+\label{lst:cpu_step}
+\end{listing}
+
+Pro zjištění adresovacího režimu dané instrukce při dekódování, se používá LUT tabulka adresovacích
+režimů, kde indexem je operační kód instrukce. Následně funkce \texttt{decode()} na základě adresovacího
+režimu zjistí adresu operandu.
+
+Výpočet adresy operandu se řídí podle tabulky, popsané v \cite{6502-datasheet}, včetně počítání
+cyklů. Prvotní návrh emulátoru CPU obsahoval tabulku, kde pro každou instrukci byl přiřazen výsledný
+počet cyklů. Avšak při implementaci catch-up mechanismu pro PPU, to se stalo problémem: uprostřed
+dekódování CPU může zasahovat do registru PPU, a ten musí dohnat stav CPU v tento okamžik, ale když
+bude synchronizován podle cyklů procesoru před vykonáním instrukce, PPU bude opožděn vůči CPU o
+několik cyklů. Když PPU bude dohánět výsledný počet cyklu aktuální instrukce, ale instrukce ještě
+nebyla vykonaná, PPU bude napřed vůči PPU.

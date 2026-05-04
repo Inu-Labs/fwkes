@@ -1,0 +1,30 @@
+@startuml
+skinparam defaultFontName Linux Biolinum G
+scale 1 as 120 pixels
+hide time-axis
+
+concise "CPU" as CPU
+concise "C1" as C1
+concise "C2" as C2
+
+@0
+CPU is "N kroků"
+C1 is {-}
+C2 is {-}
+
+@1
+CPU is {-}
+C1 is Dohánění
+C2 is {-}
+
+@2
+CPU is {-}
+C1 is {-}
+C2 is Dohánění
+
+@3
+CPU is "N kroků"
+C1 is {-}
+C2 is {-}
+
+@enduml
