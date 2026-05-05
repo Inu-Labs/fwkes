@@ -19,6 +19,10 @@
 #ifndef FWX_COMMON_H
 #define FWX_COMMON_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* MUST be a power of 2 */
 #define FWX_MAX_DATA_SIZE 256
 
@@ -59,5 +63,9 @@ typedef enum FwxCmdId {
     FWX_CMD_LED_GENERAL = 0x0a,
     FWX_CMD_SD_GET_ENTRY = 0x0b
 } FwxCmdId;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* FWX_COMMON_H */

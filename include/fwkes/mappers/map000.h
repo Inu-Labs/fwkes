@@ -20,6 +20,10 @@
 
 #include "shared.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct Mapper0 {
     uint16_t prg_c000_addr;
     uint8_t *prg_8000;
@@ -27,3 +31,7 @@ typedef struct Mapper0 {
 } Mapper0;
 
 DECLARE_MAPPER_FULL_INTERFACE(0);
+
+#ifdef __cplusplus
+}
+#endif

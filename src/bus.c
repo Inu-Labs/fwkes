@@ -1,9 +1,9 @@
 /*
- * Copyright (C) 2025-present InuLabs
+ * Copyright (C) 2025-present inunix3, kubaa-ma
  *
- * This program is free software; you can redistribute it and/or modify
+ * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -11,9 +11,8 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along
- * with this program; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include <fwkes/bus.h>
@@ -110,7 +109,7 @@ BusEvent *bus_queue_peek_ref(BusQueue *self) {
     return &self->events[self->head];
 }
 
-bool bus_init(Bus *self, Fs *fs) {
+bool bus_init(Bus *self, Fs *fs, const char *bios_path) {
     memset(self, 0, sizeof(*self));
 
     cpu_init(&self->cpu, self);
@@ -121,6 +120,8 @@ bool bus_init(Bus *self, Fs *fs) {
 
     bus_queue_init(&self->ev_queue);
     self->fs = fs;
+
+    strncpy(self->bios_path, bios_path, 256);
 
     return fwx_init(&self->fwx, fs, self);
 }
@@ -149,6 +150,12 @@ void bus_reset(Bus *self) {
 
     if (self->reset_cb) {
         self->reset_cb(self);
+    }
+}
+
+void bus_unload_disk(Bus *self) {
+    if (self->disk_connected) {
+        disk_unload(&self->disk);
     }
 }
 
@@ -195,35 +202,40 @@ static bool NOTFLASH_FN(handle_event)(Bus *self, const BusEvent *ev) {
         fwx_set_error(&self->fwx, ev->set_fwx_err.err);
 
         break;
-    case BUS_EVENT_RESET: {
+    case BUS_EVENT_RESET:
         /* TODO: handle failure of fwx_reset() */
         fwx_reset(&self->fwx);
 
-#ifdef BUILD_RP2350
-        bus_load_disk(self, "/bios.nes");
-#else
-        bus_load_disk(self, "bios.nes");
-#endif
+        bus_load_disk(self, self->bios_path);
+
+/* #ifdef BUILD_RP2350 */
+/*         bus_load_disk(self, "/bios.nes"); */
+/* #else */
+/*         if (!bus_load_disk(self, "bios.nes")) { */
+/*             printf("failed\n"); */
+/*             return true; */
+/*         } */
+/* #endif */
+        joyplayer_reset(&self->joyplayer);
+        self->joyplayer.active = true;
+        self->joypad1.state = self->joyplayer.current_buttons;
 
         return true;
-    }
     }
 
     return false;
 }
 
-bool NOTFLASH_FN(bus_update)(Bus *self) {
+void NOTFLASH_FN(bus_update)(Bus *self) {
     while (self->ev_queue.count > 0) {
         BusEvent *ev = bus_queue_peek_ref(&self->ev_queue);
 
-        if (ev && handle_event(self, ev)) {
-            return true;
+        if (ev) {
+            handle_event(self, ev);
         }
 
         bus_queue_pop(&self->ev_queue, NULL);
     }
-
-    return false;
 }
 
 void bus_add_event(Bus *self, const BusEvent *ev) {
@@ -238,7 +250,7 @@ void NOTFLASH_FN(bus_write)(Bus *self, uint16_t addr, uint8_t data) {
     case 0x1:
         /* Internal 2 KiB of RAM */
 
-        self->memory[addr & (0x0800 - 1)] = data;
+        self->memory[addr & 0x07ff] = data;
 
         break;
     case 0x2:
@@ -298,7 +310,7 @@ uint8_t NOTFLASH_FN(bus_read)(Bus *self, uint16_t addr) {
     case 0x1:
         /* Internal 2 KiB of RAM */
 
-        return self->memory[addr & (0x0800 - 1)];
+        return self->memory[addr & 0x07ff];
     case 0x2:
     case 0x3:
         /* PPU registers, mirrored */
@@ -308,7 +320,7 @@ uint8_t NOTFLASH_FN(bus_read)(Bus *self, uint16_t addr) {
             ppu_sync(&self->ppu);
         }
 
-        return ppu_read_reg(&self->ppu, 0x2000 + (addr & (8 - 1)));
+        return ppu_read_reg(&self->ppu, 0x2000 + (addr & 7));
     case 0x4:
         if (addr == CONTROLLER1_ADDR) {
             /* 0x4016: controller 1 */
@@ -334,6 +346,41 @@ uint8_t NOTFLASH_FN(bus_read)(Bus *self, uint16_t addr) {
         /* 0x4020..0xffff: unmapped/for cartridge use. */
 
         return self->disk.mapper_read(&self->disk, addr);
+    }
+
+    return 0;
+}
+
+uint8_t bus_peek(const Bus *self, uint16_t addr) {
+    /* NES memory is organized in 4 KB pages. */
+    switch (addr >> 12) {
+    case 0x0:
+    case 0x1:
+        /* Internal 2 KiB of RAM */
+        return self->memory[addr & 0x07ff];
+    case 0x2:
+    case 0x3:
+        /* PPU registers, mirrored */
+        return ppu_peek_reg(&self->ppu, 0x2000 + (addr & 7));
+    case 0x4:
+        if (addr == CONTROLLER1_ADDR) {
+            /* 0x4016: controller 1 */
+            return joypad_peek(&self->joypad1);
+        } else if (addr == CONTROLLER2_ADDR) {
+            /* 0x4017: controller 2 */
+            return joypad_peek(&self->joypad2);
+        } else if (addr >= 0x4000 && addr <= 0x4017) {
+            /* APU registers */
+            return apu_peek(&self->apu, addr);
+        } else if (addr >= 0x4018 && addr <= 0x401f) {
+            /* Disabled APU and I/O functionality, FWX */
+            return fwx_peek(&self->fwx, addr);
+        }
+
+        break;
+    default:
+        /* 0x4020..0xffff: unmapped/for cartridge use. */
+        return self->disk.mapper_peek(&self->disk, addr);
     }
 
     return 0;

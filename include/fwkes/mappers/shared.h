@@ -23,32 +23,64 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define DECLARE_MAPPER_CPU_INTERFACE(id)                                       \
-    void NOTFLASH_FN(mapper##id##_write)(                                      \
-        Disk * disk, uint16_t addr, uint8_t data                               \
-    );                                                                         \
-    uint8_t mapper##id##_read(Disk *disk, uint16_t addr)
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#define DECLARE_MAPPER_PPU_INTERFACE(id)                                       \
-    void NOTFLASH_FN(mapper##id##_ppu_write)(                                  \
-        Disk * disk, uint16_t addr, uint8_t data                               \
-    );                                                                         \
-    uint8_t NOTFLASH_FN(mapper##id##_ppu_read)(Disk * disk, uint16_t addr)
+// clang-format off
+#define DECLARE_MAPPER_CPU_INTERFACE(id)                                         \
+    void NOTFLASH_FN(mapper##id##_write)(                                        \
+        Disk *disk, uint16_t addr, uint8_t data                                  \
+    );                                                                           \
+    uint8_t NOTFLASH_FN(mapper##id##_peek)(const Disk *disk, uint16_t addr);     \
+    FORCE_INLINE uint8_t mapper##id##_read(Disk *disk, uint16_t addr) {          \
+        return mapper##id##_peek(disk, addr);                                    \
+    }
 
-#define DECLARE_MAPPER_HSYNC_FN(id)                                            \
-    void NOTFLASH_FN(mapper##id##_hsync)(Disk * disk)
+#define DECLARE_MAPPER_CPU_INTERFACE_UNIQUE_READ(id)                             \
+    void NOTFLASH_FN(mapper##id##_write)(                                        \
+        Disk *disk, uint16_t addr, uint8_t data                                  \
+    );                                                                           \
+    uint8_t NOTFLASH_FN(mapper##id##_read)(Disk *disk, uint16_t addr);           \
+    uint8_t NOTFLASH_FN(mapper##id##_peek)(const Disk *disk, uint16_t addr)
 
-#define DECLARE_MAPPER_FULL_INTERFACE(id)                                      \
-    DECLARE_MAPPER_CPU_INTERFACE(id);                                          \
-    DECLARE_MAPPER_PPU_INTERFACE(id);                                          \
+#define DECLARE_MAPPER_PPU_INTERFACE(id)                                         \
+    void NOTFLASH_FN(mapper##id##_ppu_write)(                                    \
+        Disk *disk, uint16_t addr, uint8_t data                                  \
+    );                                                                           \
+    uint8_t NOTFLASH_FN(mapper##id##_ppu_peek)(const Disk *disk, uint16_t addr); \
+    FORCE_INLINE uint8_t mapper##id##_ppu_read(Disk *disk, uint16_t addr) {      \
+        return mapper##id##_ppu_peek(disk, addr);                                \
+    }
+
+#define DECLARE_MAPPER_PPU_INTERFACE_UNIQUE_READ(id)                             \
+    void NOTFLASH_FN(mapper##id##_ppu_write)(                                    \
+        Disk *disk, uint16_t addr, uint8_t data                                  \
+    );                                                                           \
+    uint8_t NOTFLASH_FN(mapper##id##_ppu_read)(Disk *disk, uint16_t addr);       \
+    uint8_t NOTFLASH_FN(mapper##id##_ppu_peek)(const Disk *disk, uint16_t addr)
+
+#define DECLARE_MAPPER_HSYNC_FN(id)                                              \
+    void NOTFLASH_FN(mapper##id##_hsync)(Disk *disk)
+
+#define DECLARE_MAPPER_FULL_INTERFACE(id)                                        \
+    DECLARE_MAPPER_CPU_INTERFACE(id);                                            \
+    DECLARE_MAPPER_PPU_INTERFACE(id);                                            \
     DECLARE_MAPPER_HSYNC_FN(id)
+// clang-format on
 
 typedef struct Disk Disk;
 typedef unsigned MapperId;
 
 typedef void (*MapperWriteFn)(Disk *disk, uint16_t addr, uint8_t data);
 typedef uint8_t (*MapperReadFn)(Disk *disk, uint16_t addr);
+typedef uint8_t (*MapperPeekFn)(const Disk *disk, uint16_t addr);
 typedef void (*MapperPpuWriteFn)(Disk *disk, uint16_t addr, uint8_t data);
 typedef uint8_t (*MapperPpuReadFn)(Disk *disk, uint16_t addr);
+typedef uint8_t (*MapperPpuPeekFn)(const Disk *disk, uint16_t addr);
 /* Called at the end of each visible scaline when rendering is ON */
 typedef void (*MapperHsyncFn)(Disk *disk);
+
+#ifdef __cplusplus
+}
+#endif

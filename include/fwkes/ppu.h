@@ -184,6 +184,7 @@ uint8_t ppu_peek_reg(const Ppu *self, uint16_t reg);
 void ppu_write_reg(Ppu *self, uint16_t addr, uint8_t data);
 void ppu_write(Ppu *self, uint16_t addr, uint8_t data);
 uint8_t ppu_read(Ppu *self, uint16_t addr);
+uint8_t ppu_peek(const Ppu *self, uint16_t addr);
 void ppu_oam_write(Ppu *self, uint8_t data);
 
 void ppu_init(Ppu *self, Bus *bus);

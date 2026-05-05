@@ -554,9 +554,7 @@ void NOTFLASH_FN(apu_write)(Apu *self, uint16_t addr, uint8_t data) {
     }
 }
 
-uint8_t apu_read(Apu *apu, uint16_t addr) { return apu_peek(apu, addr); }
-
-uint8_t apu_peek(const Apu *self, uint16_t addr) {
+uint8_t apu_read(Apu *self, uint16_t addr) {
     if (addr == 0x4015) {
         bool pulse_1 = self->p1.len.value > 0;
         bool pulse_2 = self->p2.len.value > 0;
@@ -569,6 +567,25 @@ uint8_t apu_peek(const Apu *self, uint16_t addr) {
         bool dmc_irq = self->dmc.irq_on;
 
         cpu_irq_pulldown(&self->bus->cpu, IRQ_FRAME_CNT, false);
+
+        return channels | (uint8_t) (dmc << 4) | (uint8_t) (frame_irq << 6) |
+               (uint8_t) (dmc_irq << 7);
+    }
+
+    return 0x00;
+}
+
+uint8_t apu_peek(const Apu *self, uint16_t addr) {
+    if (addr == 0x4015) {
+        bool pulse_1 = self->p1.len.value > 0;
+        bool pulse_2 = self->p2.len.value > 0;
+        bool triangle = self->tri.len.value > 0;
+        bool noise = self->noise.len.value > 0;
+        uint8_t channels = pulse_1 | (uint8_t) (pulse_2 << 1) |
+                           (uint8_t) (triangle << 2) | (uint8_t) (noise << 3);
+        bool dmc = self->dmc.on;
+        bool frame_irq = self->frame.irq_active;
+        bool dmc_irq = self->dmc.irq_on;
 
         return channels | (uint8_t) (dmc << 4) | (uint8_t) (frame_irq << 6) |
                (uint8_t) (dmc_irq << 7);

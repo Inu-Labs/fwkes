@@ -22,6 +22,10 @@
 
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct Mapper4 {
     uint8_t bank_select;
     uint8_t bank_regs[8];
@@ -39,3 +43,7 @@ typedef struct Mapper4 {
 DECLARE_MAPPER_FULL_INTERFACE(4);
 void mapper4_update_prg(Disk *self);
 void mapper4_update_chr(Disk *self);
+
+#ifdef __cplusplus
+}
+#endif

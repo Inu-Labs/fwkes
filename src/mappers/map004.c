@@ -136,8 +136,8 @@ void NOTFLASH_FN(mapper4_write)(Disk *d, uint16_t addr, uint8_t data) {
     }
 }
 
-uint8_t NOTFLASH_FN(mapper4_read)(Disk *d, uint16_t addr) {
-    Mapper4 *m = &d->map4;
+uint8_t NOTFLASH_FN(mapper4_peek)(const Disk *d, uint16_t addr) {
+    const Mapper4 *m = &d->map4;
 
     if (addr >= 0x8000) {
         uint16_t rel = addr - 0x8000;
@@ -150,8 +150,8 @@ uint8_t NOTFLASH_FN(mapper4_read)(Disk *d, uint16_t addr) {
     return 0;
 }
 
-uint8_t NOTFLASH_FN(mapper4_ppu_read)(Disk *d, uint16_t addr) {
-    Mapper4 *m = &d->map4;
+uint8_t NOTFLASH_FN(mapper4_ppu_peek)(const Disk *d, uint16_t addr) {
+    const Mapper4 *m = &d->map4;
     return m->chr_banks[(addr >> 10) & 7][addr & 0x3FF];
 }
 

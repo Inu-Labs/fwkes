@@ -24,6 +24,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define FWX_STAT 0x4018
 #define FWX_CTRL 0x4019
 #define FWX_DATA 0x401a
@@ -89,3 +93,7 @@ uint8_t fwx_read(Fwx *self, uint16_t addr);
 uint8_t fwx_peek(const Fwx *self, uint16_t addr);
 uint8_t fwx_read_stat(Fwx *self);
 void fwx_write_ctrl(Fwx *self, uint8_t value);
+
+#ifdef __cplusplus
+}
+#endif

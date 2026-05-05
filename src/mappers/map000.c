@@ -44,7 +44,7 @@ void NOTFLASH_FN(mapper0_write)(Disk *disk, uint16_t addr, uint8_t data) {
     }
 }
 
-uint8_t NOTFLASH_FN(mapper0_read)(Disk *disk, uint16_t addr) {
+uint8_t NOTFLASH_FN(mapper0_peek)(const Disk *disk, uint16_t addr) {
     switch (addr >> 12) {
     case 0x0:
     case 0x1:
@@ -76,7 +76,7 @@ void NOTFLASH_FN(mapper0_ppu_write)(Disk *self, uint16_t addr, uint8_t data) {
     (void) data;
 }
 
-uint8_t NOTFLASH_FN(mapper0_ppu_read)(Disk *self, uint16_t addr) {
+uint8_t NOTFLASH_FN(mapper0_ppu_peek)(const Disk *self, uint16_t addr) {
     (void) self;
     (void) addr;
     return 0;

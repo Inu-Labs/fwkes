@@ -35,6 +35,8 @@ set(HEADERS
     "${INCLUDE_DIR}/log.h"
     "${INCLUDE_DIR}/ppu.h"
     "${INCLUDE_DIR}/trace.h"
+    "${INCLUDE_DIR}/joyplayer.h"
+    "${INCLUDE_DIR}/joyplayer_demo_events.h"
 )
 
 set(SOURCES
@@ -51,6 +53,7 @@ set(SOURCES
     "${SRC_DIR}/mappers/map000.c"
     "${SRC_DIR}/mappers/map002.c"
     "${SRC_DIR}/mappers/map004.c"
+    "${SRC_DIR}/joyplayer.c"
 )
 
 add_library(fwkes-obj OBJECT ${HEADERS} ${SOURCES})
@@ -86,6 +89,10 @@ if (BUILD_DESKTOP)
     add_subdirectory(desktop)
 endif()
 
+if (BUILD_DEBUGGER)
+    add_subdirectory(debugger)
+endif()
+
 if(BUILD_RP2350)
     target_compile_definitions(fwkes-obj PRIVATE -DBUILD_RP2350)
     target_link_libraries(fwkes-obj PRIVATE
@@ -96,4 +103,8 @@ if(BUILD_RP2350)
     )
 
     add_subdirectory(rp2350)
+endif()
+
+if (BUILD_DEBUG_PLAYBACK)
+target_compile_definitions(fwkes-obj PUBLIC BUILD_DEBUG_PLAYBACK)
 endif()

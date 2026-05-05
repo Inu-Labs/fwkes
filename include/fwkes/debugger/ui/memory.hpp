@@ -1,19 +1,33 @@
 #pragma once
 
+#include "../emu.hpp"
 #include "window.hpp"
-#include "../vm.hpp"
 
 #include <imgui_memory_editor.h>
 
 namespace ui {
-    class Memory : public Window {
-    public:
-        Memory(Vm &vm);
+    enum class MemoryMap {
+        Cpu,
+        Ppu,
+    };
 
-    private:
+    class Memory : public Window {
+      public:
+        Memory(Emulator &emu);
+
+        Emulator &emu() { return m_emu; }
+
+        const Emulator &emu() const { return m_emu; }
+
+        MemoryMap curr_map() const { return m_curr_map; }
+
+        size_t size() const;
+
+      private:
         void main() override;
 
         MemoryEditor m_mem_edit;
-        Vm &m_vm;
+        Emulator &m_emu;
+        MemoryMap m_curr_map = MemoryMap::Cpu;
     };
 }

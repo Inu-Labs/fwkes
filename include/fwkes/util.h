@@ -19,12 +19,18 @@
 #pragma once
 
 #include <stdint.h>
+#include <inttypes.h>
 
 #ifdef BUILD_RP2350
 #    include <pico/stdlib.h>
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define FORCE_INLINE static inline __attribute__((always_inline))
+
 #ifdef BUILD_RP2350
 #    define NOTFLASH_FN(name) __not_in_flash_func(name)
 #else
@@ -34,7 +40,13 @@
 #ifdef BUILD_RP2350
 typedef uint32_t CycleCounter;
 typedef int32_t CycleDiff;
+#define CYCLE_COUNTER_PRIu PRIu32
 #else
 typedef uint64_t CycleCounter;
 typedef int64_t CycleDiff;
+#define CYCLE_COUNTER_PRIu PRIu64
+#endif
+
+#ifdef __cplusplus
+}
 #endif

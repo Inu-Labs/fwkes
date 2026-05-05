@@ -1,16 +1,19 @@
 #pragma once
 
-#include "../vm.hpp"
+#include "../emu.hpp"
 #include "window.hpp"
 
 namespace ui {
     class Registers : public Window {
     public:
-        Registers(Vm &vm);
+        Registers(Emulator &emu);
 
     private:
         void main() override;
 
-        Vm &m_vm;
+        void section_cpu();
+        void section_ppu();
+
+        Emulator &m_emu;
     };
 }

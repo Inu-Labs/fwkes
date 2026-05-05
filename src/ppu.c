@@ -476,6 +476,30 @@ uint8_t NOTFLASH_FN(ppu_read)(Ppu *self, uint16_t addr) {
     return self->palettes[pal_addr];
 }
 
+uint8_t ppu_peek(const Ppu *self, uint16_t addr) {
+    addr &= 0x3fff;
+
+    if (addr < 0x2000) {
+        if (self->bus->disk.mapper_ppu_peek) {
+            return self->bus->disk.mapper_ppu_peek(&self->bus->disk, addr);
+        }
+
+        return self->chr[addr];
+    }
+
+    if (addr < 0x3f00) {
+        return self->nt[(addr >> 10) & 3][addr & 0x3ff];
+    }
+
+    uint16_t pal_addr = addr & 0x1f;
+
+    if ((pal_addr & 0x03) == 0 && (pal_addr & 0x10)) {
+        pal_addr &= ~0x10;
+    }
+
+    return self->palettes[pal_addr];
+}
+
 void NOTFLASH_FN(ppu_oam_write)(Ppu *self, uint8_t data) {
     self->oam[self->oam_addr] = data;
     ++self->oam_addr;

@@ -29,6 +29,10 @@
 #    define SAMPLE_RATE 44100
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct Bus Bus;
 
 typedef struct {
@@ -159,3 +163,7 @@ void apu_write(Apu *apu, uint16_t addr, uint8_t data);
 uint8_t apu_read(Apu *apu, uint16_t addr);
 uint8_t apu_peek(const Apu *apu, uint16_t addr);
 void apu_run_until(Apu *apu, CycleCounter target_cycles);
+
+#ifdef __cplusplus
+}
+#endif

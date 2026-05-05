@@ -20,6 +20,10 @@
 
 #include "shared.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct Mapper2 {
     uint8_t prg_bank;
     uint8_t prg_bank_count;
@@ -28,3 +32,7 @@ typedef struct Mapper2 {
 } Mapper2;
 
 DECLARE_MAPPER_CPU_INTERFACE(2);
+
+#ifdef __cplusplus
+}
+#endif

@@ -20,6 +20,10 @@
 
 #include <stddef.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct Fs {
     void *internal;
 } Fs;
@@ -84,3 +88,7 @@ FsError file_size(File *self, size_t *out);
 FsError dir_close(Dir *self);
 FsError dir_read(Dir *self, DirEntry *entry);
 FsError dir_rewind(Dir *self);
+
+#ifdef __cplusplus
+}
+#endif

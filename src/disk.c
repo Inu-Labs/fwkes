@@ -168,6 +168,7 @@ static bool parse(Disk *self) {
 
         self->mapper_write = mapper0_write;
         self->mapper_read = mapper0_read;
+        self->mapper_peek = mapper0_peek;
         self->mapper_ppu_read = NULL;
         self->mapper_ppu_write = NULL;
         self->mapper_hsync = NULL;
@@ -188,6 +189,7 @@ static bool parse(Disk *self) {
 
         self->mapper_write = mapper2_write;
         self->mapper_read = mapper2_read;
+        self->mapper_peek = mapper2_peek;
         self->mapper_ppu_read = NULL;
         self->mapper_ppu_write = NULL;
         self->mapper_hsync = NULL;
@@ -205,7 +207,7 @@ static bool parse(Disk *self) {
 
         memset(m, 0, sizeof(Mapper4));
 
-        m->prg_bank_count = self->prg_size / 0x2000;
+        m->prg_bank_count = (uint8_t) (self->prg_size / 0x2000);
         if (m->prg_bank_count == 0) {
             m->prg_bank_count = 1;
         }
@@ -220,8 +222,10 @@ static bool parse(Disk *self) {
 
         self->mapper_write = mapper4_write;
         self->mapper_read = mapper4_read;
-        self->mapper_ppu_read = mapper4_ppu_read;
+        self->mapper_peek = mapper4_peek;
         self->mapper_ppu_write = mapper4_ppu_write;
+        self->mapper_ppu_read = mapper4_ppu_read;
+        self->mapper_ppu_peek = mapper4_ppu_peek;
         self->mapper_hsync = mapper4_hsync;
 
         break;

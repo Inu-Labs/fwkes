@@ -25,6 +25,8 @@
 #include "fs.h"
 #include "fwx/private.h"
 #include "ppu.h"
+#include "joyplayer.h"
+
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -78,6 +80,18 @@ bool bus_queue_peek(BusQueue *self, BusEvent *out);
 
 typedef void (*BusResetCallback)(Bus *bus);
 
+typedef enum BusErrorId {
+    BUS_ERROR_OK,
+    BUS_ERROR_FWX,
+} BusErrorId;
+
+typedef struct BusError {
+    BusErrorId id;
+    union {
+        FwxError err;
+    };
+} BusError;
+
 typedef struct Bus {
     Cpu cpu;
     Ppu ppu;
@@ -93,15 +107,19 @@ typedef struct Bus {
     void *user_data;
     BusResetCallback reset_cb;
     bool reset_requested;
+    JoyPlayer joyplayer;
+    char bios_path[256];
 } Bus;
 
-bool bus_init(Bus *self, Fs *fs);
+bool bus_init(Bus *self, Fs *fs, const char *bios_path);
 void bus_deinit(Bus *self);
 void bus_reset(Bus *self);
-bool bus_update(Bus *self);
+void bus_unload_disk(Bus *self);
+void bus_update(Bus *self);
 void bus_add_event(Bus *self, const BusEvent *ev);
 void bus_write(Bus *self, uint16_t address, uint8_t data);
 uint8_t bus_read(Bus *self, uint16_t address);
+uint8_t bus_peek(const Bus *self, uint16_t address);
 bool bus_load_disk(Bus *self, const char *path);
 bool bus_load_disk_mem(Bus *self, const uint8_t *data, unsigned size);
 void bus_hsync(Bus *self);

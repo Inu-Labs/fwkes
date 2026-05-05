@@ -107,8 +107,10 @@ typedef struct Disk {
 
     MapperWriteFn mapper_write;
     MapperReadFn mapper_read;
-    MapperPpuReadFn mapper_ppu_read;
+    MapperPeekFn mapper_peek;
     MapperPpuWriteFn mapper_ppu_write;
+    MapperPpuReadFn mapper_ppu_read;
+    MapperPpuPeekFn mapper_ppu_peek;
     MapperHsyncFn mapper_hsync;
 } Disk;
 

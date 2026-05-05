@@ -13,11 +13,16 @@ namespace ui {
         void render();
 
         void show() { m_show = true; }
-
         void hide() { m_show = false; }
+
+        bool &show_flag() { return m_show; }
+
+        bool hidden() const { return !m_show; }
 
       private:
         virtual void main() = 0;
+        virtual void pre_main();
+        virtual void post_main();
 
         std::string m_title;
         ImGuiWindowFlags m_flags;

@@ -21,6 +21,10 @@
 
 #include "common.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define FWXSTAT *((volatile unsigned char *) 0x4018)
 #define FWXCTRL *((volatile unsigned char *) 0x4019)
 #define FWXDATA *((volatile unsigned char *) 0x401a)
@@ -38,5 +42,9 @@
 #define fwx_wait_rx_ready() while (!fwx_rx_ready())
 
 #define fwx_last_error() (FWXSTAT & 0x0f)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* FWX_PUBLIC_H */

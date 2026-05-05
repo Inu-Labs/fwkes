@@ -1,23 +1,30 @@
 #pragma once
 
+#include "message.hpp"
 #include "ui/ui.hpp"
-#include "vm.hpp"
+#include "emu.hpp"
 
 #include <SDL3/SDL.h>
 
-class Fwkes {
+#include <queue>
+
+class Debugger {
   public:
-    Fwkes(SDL_Window *win, SDL_Renderer *renderer);
+    Debugger(SDL_Window *win, SDL_Renderer *renderer);
 
     void run();
 
   private:
     void update();
     void render();
+    void handle_events();
+    void handle_messages();
+    void update_input();
 
-    SDL_Renderer *m_renderer;
+    SDL_Renderer *m_renderer = nullptr;
     bool m_quit = false;
+    std::queue<Message> m_msg_queue;
 
-    Vm m_vm;
+    Emulator m_emu;
     ui::Ui m_ui;
 };

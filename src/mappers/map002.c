@@ -56,7 +56,7 @@ NOTFLASH_FN(mapper2_write)(Disk *self, uint16_t addr, uint8_t data) {
     }
 }
 
-uint8_t NOTFLASH_FN(mapper2_read)(Disk *self, uint16_t addr) {
+uint8_t NOTFLASH_FN(mapper2_peek)(const Disk *self, uint16_t addr) {
     switch (addr >> 12) {
     case 0x0:
     case 0x1:

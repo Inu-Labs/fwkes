@@ -35,18 +35,21 @@ endif()
 
 
 option(BUILD_RP2350 "build for RP2350 based boards" OFF)
-option(BUILD_DESKTOP "build debugger (PC only)" OFF)
+option(BUILD_DESKTOP "build desktop backend (PC only)" OFF)
+option(BUILD_DEBUGGER "build debugger (PC only)" OFF)
 option(BUILD_PIMORONI2 "specify Pimoroni Pico Plus 2 as a target RP2350 board" OFF)
 option(BUILD_TESTS "build unit tests" OFF)
 option(BUILD_VISUAL_TESTS "build tests with graphics" OFF)
 option(USE_ASAN "Enable AddressSanitizer" OFF)
 option(USE_UBSAN "Enable UndefinedBehaviorSanitizer" OFF)
+option(BUILD_DEBUG_PLAYBACK "Enable debug playback controls" OFF)
+
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS ON)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
 

@@ -109,16 +109,6 @@ static void scanline_callback(Ppu *ppu) {
     static uint32_t colors_lut[32];
     Emulator *self = ppu->user_data;
 
-    // for (unsigned i = 0; i < 256; ++i) {
-    //     uint8_t px = self->scanline_buf[i];
-    //     uint8_t pallete_idx = (px & 0b11000) >> 3;
-    //     uint8_t color_idx = (px & 0b110) >> 1;
-    //     uint16_t base_addr = (px & 0x1) ? 0x3f10 : 0x3f00;
-    //
-    //     self->framebuffer[self->scanline][i] =
-    //         g_colors[ppu_read(ppu, base_addr + pallete_idx * 4 + color_idx)];
-    // }
-
     if (ppu->colors_lut_dirty) {
         memcpy(colors_lut, ppu->colors_lut, 32 * sizeof(PpuPixel));
         ppu->colors_lut_dirty = false;
@@ -128,11 +118,6 @@ static void scanline_callback(Ppu *ppu) {
         uint8_t px = ppu->scanline_buf[i];
         self->framebuffer[self->scanline][i] = colors_lut[px & 0x1f];
     }
-
-    // memcpy(
-    //     self->framebuffer[self->scanline], ppu->scanline_buf,
-    //     PPU_WIDTH * sizeof(PpuPixel)
-    // );
 
     if (++self->scanline == 240) {
         self->frame_done = true;
@@ -176,7 +161,12 @@ void emu_init(Emulator *self) {
     // );
 
     fs_init(&self->fs);
-    bus_init(&self->bus, &self->fs);
+
+    char bios_path[256];
+    fs_pwd(&self->fs, bios_path, 255);
+    strncat(bios_path, "/bios.nes", 256);
+
+    bus_init(&self->bus, &self->fs, bios_path);
 
     self->bus.reset_cb = reset_callback;
     self->draw_grid = false;
@@ -190,7 +180,7 @@ void emu_init(Emulator *self) {
     self->bus.apu.user_data = self;
     ppu_init_pixel_luts(&self->bus.ppu);
 
-    if (!bus_load_disk(&self->bus, "bios.nes")) {
+    if (!bus_load_disk(&self->bus, bios_path)) {
         log_msg(LOG_ERROR, "cannot load BIOS file");
 
         exit(-1);
@@ -198,7 +188,6 @@ void emu_init(Emulator *self) {
 }
 
 void emu_reset(Emulator *self) {
-    memset(self->scanline_buf, 0, sizeof(self->scanline_buf));
     memset(self->framebuffer, 0, sizeof(self->framebuffer));
     self->frame_done = false;
     self->scanline = 0;
@@ -355,7 +344,7 @@ int main(void) {
     emu_init(&emu);
 
     if (!SDL_CreateWindowAndRenderer(
-            "PPU simple test", 256 * 2, 240 * 2, 0, &emu.win, &emu.renderer
+            "FWKES (Desktop)", 256 * 2, 240 * 2, 0, &emu.win, &emu.renderer
         )) {
         SDL_Quit();
 
