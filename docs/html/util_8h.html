@@ -118,6 +118,9 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('util_8h.html',
   <div class="headertitle"><div class="title">util.h File Reference</div></div>
 </div><!--header-->
 <div class="contents">
+
+<p>Utility macros, attributes, and platform-specific type definitions.  
+<a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;stdint.h&gt;</code><br />
 </div>
 <p><a href="util_8h_source.html">Go to the source code of this file.</a></p>
@@ -125,14 +128,58 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('util_8h.html',
 <tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:ac032d233a8ebfcd82fd49d0824eefb18" id="r_ac032d233a8ebfcd82fd49d0824eefb18"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ac032d233a8ebfcd82fd49d0824eefb18">FORCE_INLINE</a>&#160;&#160;&#160;static inline <a class="el" href="ppu_8c.html#a0b8beba22f89b433155bf3ca14b43eae">__attribute__</a>((always_inline))</td></tr>
+<tr class="memdesc:ac032d233a8ebfcd82fd49d0824eefb18"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decorator that instructs the compiler to always inline the function.  <br /></td></tr>
 <tr class="memitem:a8a41c2e2ebe0fe078423e650b5f206b9" id="r_a8a41c2e2ebe0fe078423e650b5f206b9"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a8a41c2e2ebe0fe078423e650b5f206b9">NOTFLASH_FN</a>(name)</td></tr>
+<tr class="memdesc:a8a41c2e2ebe0fe078423e650b5f206b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">No-op fallback for non-RP2350 targets.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-typedef-members" class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 Typedefs</h2></td></tr>
 <tr class="memitem:a7ba783f63d291947d249f2b1658746a3" id="r_a7ba783f63d291947d249f2b1658746a3"><td class="memItemLeft">typedef uint64_t&#160;</td><td class="memItemRight"><a class="el" href="#a7ba783f63d291947d249f2b1658746a3">CycleCounter</a></td></tr>
+<tr class="memdesc:a7ba783f63d291947d249f2b1658746a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unsigned type that holds a raw hardware cycle-counter value (generic).  <br /></td></tr>
 <tr class="memitem:aa0197eb968c0b5cade79d3998a2d1648" id="r_aa0197eb968c0b5cade79d3998a2d1648"><td class="memItemLeft">typedef int64_t&#160;</td><td class="memItemRight"><a class="el" href="#aa0197eb968c0b5cade79d3998a2d1648">CycleDiff</a></td></tr>
+<tr class="memdesc:aa0197eb968c0b5cade79d3998a2d1648"><td class="mdescLeft">&#160;</td><td class="mdescRight">Signed type for the difference between two <a class="el" href="#a7ba783f63d291947d249f2b1658746a3" title="CycleCounter">CycleCounter</a> values (generic).  <br /></td></tr>
 </table>
-<a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Utility macros, attributes, and platform-specific type definitions. </p>
+<p>This header centralizes low-level portability helpers used across the codebase. It abstracts away compiler-specific attributes and platform-specific integer widths so that the rest of the code can be written in a target-agnostic way.</p>
+<p>Specifically, this header provides:</p><ul>
+<li><a class="el" href="#ac032d233a8ebfcd82fd49d0824eefb18" title="FORCE_INLINE">FORCE_INLINE</a> – compiler hint to always inline a function.</li>
+<li><a class="el" href="#a8a41c2e2ebe0fe078423e650b5f206b9" title="NOTFLASH_FN">NOTFLASH_FN</a> – attribute that places a function in RAM rather than flash (RP2350 only; no-op elsewhere).</li>
+<li><a class="el" href="#a7ba783f63d291947d249f2b1658746a3" title="CycleCounter">CycleCounter</a> – unsigned integer type wide enough to hold a hardware cycle-counter value on the current target.</li>
+<li><a class="el" href="#aa0197eb968c0b5cade79d3998a2d1648" title="CycleDiff">CycleDiff</a> – signed counterpart of <a class="el" href="#a7ba783f63d291947d249f2b1658746a3" title="Unsigned type that holds a raw hardware cycle-counter value (generic).">CycleCounter</a>, suitable for expressing the difference between two timestamps.</li>
+</ul>
+<dl class="section user"><dt>Supported platforms</dt><dd><table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Macro defined  </th><th class="markdownTableHeadNone">Target  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">BUILD_RP2350  </td><td class="markdownTableBodyNone">Raspberry Pi RP2350 (Pico SDK)  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><em>(none)</em>  </td><td class="markdownTableBodyNone">Generic desktop / host build  </td></tr>
+</table>
+</dd></dl>
+<dl class="section user"><dt>Usage example</dt><dd><div class="fragment"><div class="line"><span class="preprocessor">#include &quot;<a class="code" href="util_8h.html">util.h</a>&quot;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Always inlined helper – zero call overhead in hot loops.</span></div>
+<div class="line"><a class="code hl_define" href="#ac032d233a8ebfcd82fd49d0824eefb18">FORCE_INLINE</a> uint32_t saturate(uint32_t v, uint32_t max) {</div>
+<div class="line">    <span class="keywordflow">return</span> v &gt; max ? max : v;</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Placed in RAM so it can safely run while flash is being erased.</span></div>
+<div class="line"><span class="keywordtype">void</span> <a class="code hl_define" href="#a8a41c2e2ebe0fe078423e650b5f206b9">NOTFLASH_FN</a>(flash_safe_isr)(void) { ... }</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Portable timing measurement.</span></div>
+<div class="line"><a class="code hl_typedef" href="#a7ba783f63d291947d249f2b1658746a3">CycleCounter</a> t0 = read_cycle_counter();</div>
+<div class="line">do_work();</div>
+<div class="line"><a class="code hl_typedef" href="#aa0197eb968c0b5cade79d3998a2d1648">CycleDiff</a> elapsed = (<a class="code hl_typedef" href="#aa0197eb968c0b5cade79d3998a2d1648">CycleDiff</a>)(read_cycle_counter() - t0);</div>
+<div class="ttc" id="autil_8h_html"><div class="ttname"><a href="util_8h.html">util.h</a></div><div class="ttdoc">Utility macros, attributes, and platform-specific type definitions.</div></div>
+<div class="ttc" id="autil_8h_html_a7ba783f63d291947d249f2b1658746a3"><div class="ttname"><a href="#a7ba783f63d291947d249f2b1658746a3">CycleCounter</a></div><div class="ttdeci">uint64_t CycleCounter</div><div class="ttdoc">Unsigned type that holds a raw hardware cycle-counter value (generic).</div><div class="ttdef"><b>Definition</b> <a href="util_8h_source.html#l00209">util.h:209</a></div></div>
+<div class="ttc" id="autil_8h_html_a8a41c2e2ebe0fe078423e650b5f206b9"><div class="ttname"><a href="#a8a41c2e2ebe0fe078423e650b5f206b9">NOTFLASH_FN</a></div><div class="ttdeci">#define NOTFLASH_FN(name)</div><div class="ttdoc">No-op fallback for non-RP2350 targets.</div><div class="ttdef"><b>Definition</b> <a href="util_8h_source.html#l00159">util.h:159</a></div></div>
+<div class="ttc" id="autil_8h_html_aa0197eb968c0b5cade79d3998a2d1648"><div class="ttname"><a href="#aa0197eb968c0b5cade79d3998a2d1648">CycleDiff</a></div><div class="ttdeci">int64_t CycleDiff</div><div class="ttdoc">Signed type for the difference between two CycleCounter values (generic).</div><div class="ttdef"><b>Definition</b> <a href="util_8h_source.html#l00219">util.h:219</a></div></div>
+<div class="ttc" id="autil_8h_html_ac032d233a8ebfcd82fd49d0824eefb18"><div class="ttname"><a href="#ac032d233a8ebfcd82fd49d0824eefb18">FORCE_INLINE</a></div><div class="ttdeci">#define FORCE_INLINE</div><div class="ttdoc">Decorator that instructs the compiler to always inline the function.</div><div class="ttdef"><b>Definition</b> <a href="util_8h_source.html#l00101">util.h:101</a></div></div>
+</div><!-- fragment --> </dd></dl>
+
+<p class="definition">Definition in file <a class="el" href="util_8h_source.html">util.h</a>.</p>
+</div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
 <a id="ac032d233a8ebfcd82fd49d0824eefb18" name="ac032d233a8ebfcd82fd49d0824eefb18"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac032d233a8ebfcd82fd49d0824eefb18">&#9670;&#160;</a></span>FORCE_INLINE</h2>
 
@@ -145,7 +192,25 @@ Typedefs</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="util_8h_source.html#l00027">27</a> of file <a class="el" href="util_8h_source.html">util.h</a>.</p>
+<p>Decorator that instructs the compiler to always inline the function. </p>
+<p>Combining <span class="tt">static</span>, <span class="tt">inline</span>, and GCC/Clang's <span class="tt">__attribute__((always_inline))</span> guarantees that the function body is substituted at every call site, regardless of the optimisation level or the compiler's own inlining heuristics.</p>
+<dl class="section user"><dt>When to use</dt><dd><ul>
+<li>Tiny, performance-critical helpers called in tight loops.</li>
+<li>Functions whose call overhead would measurably affect timing.</li>
+<li>Wrappers around a single instruction or intrinsic.</li>
+</ul>
+</dd></dl>
+<dl class="section user"><dt>When <em>not</em> to use</dt><dd><ul>
+<li>Large functions – forced inlining inflates code size and can hurt I-cache performance.</li>
+<li>Functions that are only called once – the compiler already inlines those automatically.</li>
+</ul>
+</dd></dl>
+<dl class="section user"><dt>Example</dt><dd><div class="fragment"><div class="line"><a class="code hl_define" href="#ac032d233a8ebfcd82fd49d0824eefb18">FORCE_INLINE</a> uint8_t clamp_u8(<span class="keywordtype">int</span> v) {</div>
+<div class="line">    <span class="keywordflow">return</span> (uint8_t)(v &lt; 0 ? 0 : v &gt; 255 ? 255 : v);</div>
+<div class="line">}</div>
+</div><!-- fragment --> </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="util_8h_source.html#l00101">101</a> of file <a class="el" href="util_8h_source.html">util.h</a>.</p>
 
 </div>
 </div>
@@ -165,7 +230,16 @@ Typedefs</h2></td></tr>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">name</div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="util_8h_source.html#l00031">31</a> of file <a class="el" href="util_8h_source.html">util.h</a>.</p>
+<p>No-op fallback for non-RP2350 targets. </p>
+<p>On desktop / host builds there is no flash-vs-RAM distinction, so this macro expands to the function name unchanged. Code that uses <span class="tt"><a class="el" href="#a8a41c2e2ebe0fe078423e650b5f206b9" title="No-op fallback for non-RP2350 targets.">NOTFLASH_FN</a></span> therefore compiles and links correctly on all targets without any <span class="tt">#ifdef</span> guards at the call site.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name</td><td>The bare function name (passed through unmodified). </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="util_8h_source.html#l00159">159</a> of file <a class="el" href="util_8h_source.html">util.h</a>.</p>
 
 </div>
 </div>
@@ -182,7 +256,10 @@ Typedefs</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="util_8h_source.html#l00038">38</a> of file <a class="el" href="util_8h_source.html">util.h</a>.</p>
+<p>Unsigned type that holds a raw hardware cycle-counter value (generic). </p>
+<p>On 64-bit desktop targets (Linux, macOS, Windows) performance counters are typically 64-bit values (e.g. <span class="tt">clock_gettime(CLOCK_MONOTONIC)</span> nanoseconds, or the x86 <span class="tt">RDTSC</span> instruction). Using a 64-bit type avoids lossy truncation and extends the wrap-around period to ~584 years at 1 GHz. </p>
+
+<p class="definition">Definition at line <a class="el" href="util_8h_source.html#l00209">209</a> of file <a class="el" href="util_8h_source.html">util.h</a>.</p>
 
 </div>
 </div>
@@ -198,7 +275,10 @@ Typedefs</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="util_8h_source.html#l00039">39</a> of file <a class="el" href="util_8h_source.html">util.h</a>.</p>
+<p>Signed type for the difference between two <a class="el" href="#a7ba783f63d291947d249f2b1658746a3" title="CycleCounter">CycleCounter</a> values (generic). </p>
+<p>The signed 64-bit type can represent differences up to ~292 years worth of nanoseconds, which is sufficient for any practical measurement on a desktop host. </p>
+
+<p class="definition">Definition at line <a class="el" href="util_8h_source.html#l00219">219</a> of file <a class="el" href="util_8h_source.html">util.h</a>.</p>
 
 </div>
 </div>
