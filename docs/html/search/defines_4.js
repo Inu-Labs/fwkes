@@ -1,0 +1,26 @@
+var searchData=
+[
+  ['false_0',['FALSE',['../neslib_8h.html#aa93f0eb578d23995850d61f7d61c55c1',1,'neslib.h']]],
+  ['filename_5fmax_5fsize_1',['FILENAME_MAX_SIZE',['../fs_8h.html#a24c1405225e4ce27b24bcf4f32f4ff0e',1,'fs.h']]],
+  ['files_5fper_5fpage_2',['FILES_PER_PAGE',['../bios_2main_8c.html#a11e468067e5f9fd0f98e0928bf4bda6c',1,'main.c']]],
+  ['fixed_5fcycles_5fper_5fsample_3',['FIXED_CYCLES_PER_SAMPLE',['../apu_8c.html#a1bddc15c508f8bfdde3b13d883f2cb46',1,'apu.c']]],
+  ['force_5finline_4',['FORCE_INLINE',['../util_8h.html#ac032d233a8ebfcd82fd49d0824eefb18',1,'util.h']]],
+  ['frame_5fcnt_5ffreq_5',['FRAME_CNT_FREQ',['../apu_8c.html#a149e5fce9c506f8fdf61819358ec99af',1,'apu.c']]],
+  ['frame_5ftime_6',['FRAME_TIME',['../desktop_2main_8c.html#ab50ebddbf2f210d61bcc9013973747a1',1,'FRAME_TIME:&#160;main.c'],['../rp2350_2main_8c.html#ab50ebddbf2f210d61bcc9013973747a1',1,'FRAME_TIME:&#160;main.c']]],
+  ['fwx_5fctrl_7',['FWX_CTRL',['../private_8h.html#acc735ec9adabb7c5bda993a79723abae',1,'private.h']]],
+  ['fwx_5fdata_8',['FWX_DATA',['../private_8h.html#a481b55eac94716473396e1559ed7c485',1,'private.h']]],
+  ['fwx_5flast_5ferror_9',['fwx_last_error',['../public_8h.html#aca4bace5a8992e4ba1501b0ebb946942',1,'public.h']]],
+  ['fwx_5fmax_5fdata_5fsize_10',['FWX_MAX_DATA_SIZE',['../common_8h.html#a3aef113595f5a4f6b19bfc6e924b4c2a',1,'common.h']]],
+  ['fwx_5fread_5fu8_11',['fwx_read_u8',['../public_8h.html#aa5bcc275efc54d424769ec6d4240fca9',1,'public.h']]],
+  ['fwx_5frx_5fready_12',['fwx_rx_ready',['../public_8h.html#ac6e457e8bddb6f7b36c134a17d425bc7',1,'public.h']]],
+  ['fwx_5fstart_13',['fwx_start',['../public_8h.html#a6efa88ff1e2608caa0d9a5b40d6ba8cb',1,'public.h']]],
+  ['fwx_5fstat_14',['FWX_STAT',['../private_8h.html#a75797ea0633b010c6c414ca8a20b684b',1,'private.h']]],
+  ['fwx_5fstop_15',['fwx_stop',['../public_8h.html#a69c7a131f68db28acc18b588df3a4c9d',1,'public.h']]],
+  ['fwx_5ftx_5fdone_16',['fwx_tx_done',['../public_8h.html#a1eef4e49578b896fdb0dc714b5a661d1',1,'public.h']]],
+  ['fwx_5fwait_5frx_5fready_17',['fwx_wait_rx_ready',['../public_8h.html#ae6fae80a0245e498de8257e6eb9ff5c0',1,'public.h']]],
+  ['fwx_5fwait_5ftx_5fdone_18',['fwx_wait_tx_done',['../public_8h.html#ae9b5e232ee8e2bdc39306bf0f6bf51e2',1,'public.h']]],
+  ['fwx_5fwrite_5fu8_19',['fwx_write_u8',['../public_8h.html#a1cdfe70c8d6dc0a2f53caaf261511eac',1,'public.h']]],
+  ['fwxctrl_20',['FWXCTRL',['../public_8h.html#a10a4ecb87f6c7b424c2425bcc85fea68',1,'public.h']]],
+  ['fwxdata_21',['FWXDATA',['../public_8h.html#a1a51f2ba8490de66e495cbe2d60ae25a',1,'public.h']]],
+  ['fwxstat_22',['FWXSTAT',['../public_8h.html#a82addc4f252d39771001317a309243f2',1,'public.h']]]
+];

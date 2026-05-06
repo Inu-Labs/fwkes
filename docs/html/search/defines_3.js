@@ -1,0 +1,24 @@
+var searchData=
+[
+  ['declare_5fmapper_5fcpu_5finterface_0',['DECLARE_MAPPER_CPU_INTERFACE',['../shared_8h.html#ac4969bda3f3fd686751b7b3e2f978b33',1,'shared.h']]],
+  ['declare_5fmapper_5ffull_5finterface_1',['DECLARE_MAPPER_FULL_INTERFACE',['../shared_8h.html#af791cf92c71e6b1ed8cd8995da4b84c1',1,'shared.h']]],
+  ['declare_5fmapper_5fhsync_5ffn_2',['DECLARE_MAPPER_HSYNC_FN',['../shared_8h.html#adbceea57e3b534056e8cf84775a5ffe0',1,'shared.h']]],
+  ['declare_5fmapper_5fppu_5finterface_3',['DECLARE_MAPPER_PPU_INTERFACE',['../shared_8h.html#ad5ac9ff9b0894b85abde08f9e42cf7f8',1,'shared.h']]],
+  ['default_5flog_5fstream_4',['DEFAULT_LOG_STREAM',['../log_8h.html#a273bcbfe38beb524a8796c1b83ef89d9',1,'log.h']]],
+  ['default_5fpio_5finst_5',['DEFAULT_PIO_INST',['../video_8c.html#a8246df116d91430f4767fddc2c944f7a',1,'video.c']]],
+  ['default_5fserial_5fconfig_6',['DEFAULT_SERIAL_CONFIG',['../video_8c.html#a05e365ced6c4a66155e7a74fbd9d25d3',1,'video.c']]],
+  ['default_5ftrace_5fstream_7',['DEFAULT_TRACE_STREAM',['../trace_8h.html#aff3922f83a72fe29284815c91624228b',1,'trace.h']]],
+  ['disk_5fcalloc_8',['disk_calloc',['../disk_8c.html#a6326fa7a23e48dd9255ba2284aef3f82',1,'disk.c']]],
+  ['disk_5ffree_9',['disk_free',['../disk_8c.html#a835461dde67473819090c8e7d7246171',1,'disk.c']]],
+  ['disk_5fmalloc_10',['disk_malloc',['../disk_8c.html#adc3cbce9404ce2b33c4e7e8014d534d6',1,'disk.c']]],
+  ['dispatch_11',['DISPATCH',['../cpu_8c.html#a8297cddbebf50a1736914db65c5724ae',1,'cpu.c']]],
+  ['dlog_5fbus_12',['dlog_bus',['../log_8h.html#a52636096818744f93b073c4b3c289a57',1,'log.h']]],
+  ['dlog_5fcpu_13',['dlog_cpu',['../log_8h.html#aeacf2cbad31899d03d2688b5ee542a7f',1,'log.h']]],
+  ['dlog_5fmsg_14',['dlog_msg',['../log_8h.html#a645e7142f32cdea76d0c5436b2da891b',1,'log.h']]],
+  ['dlog_5fppu_15',['dlog_ppu',['../log_8h.html#a1d8014973a637febb81edb15f5acd6fb',1,'log.h']]],
+  ['dots_5fper_5fscanline_16',['DOTS_PER_SCANLINE',['../desktop_2main_8c.html#ac22b7b024225bd6787f01307a8e8d160',1,'DOTS_PER_SCANLINE:&#160;main.c'],['../rp2350_2main_8c.html#ac22b7b024225bd6787f01307a8e8d160',1,'DOTS_PER_SCANLINE:&#160;main.c']]],
+  ['dots_5funtil_5fnmi_17',['DOTS_UNTIL_NMI',['../desktop_2main_8c.html#a1fdce8fedaefd168f934fa3c8bc3ed91',1,'DOTS_UNTIL_NMI:&#160;main.c'],['../rp2350_2main_8c.html#a1fdce8fedaefd168f934fa3c8bc3ed91',1,'DOTS_UNTIL_NMI:&#160;main.c']]],
+  ['dummy_5fcycle_18',['dummy_cycle',['../cpu_8c.html#afdedff1af89fbe7f97d32f2c549ba920',1,'cpu.c']]],
+  ['dummy_5fread_19',['dummy_read',['../cpu_8c.html#add61762ea145653f3a2052ec1acf0120',1,'cpu.c']]],
+  ['dvi_5ftiming_20',['DVI_TIMING',['../video_8c.html#a67eb491905fa17dc61429c0f27ef1506',1,'video.c']]]
+];
