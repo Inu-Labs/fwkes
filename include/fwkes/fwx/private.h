@@ -28,14 +28,20 @@
 #define FWX_CTRL 0x4019
 #define FWX_DATA 0x401a
 
+/**
+ * Exposed registers to emulated program.
+ */
 typedef struct FwxRegs {
-    volatile uint8_t STAT;
-    volatile uint8_t CTRL;
-    volatile uint8_t DATA;
+    uint8_t STAT;
+    uint8_t CTRL;
+    uint8_t DATA;
 } FwxRegs;
 
 typedef char FileItem[256];
 
+/**
+ * Internal data buffer.
+ */
 typedef struct FwxBuffer {
     uint8_t data[FWX_MAX_DATA_SIZE];
     unsigned size;
@@ -43,48 +49,122 @@ typedef struct FwxBuffer {
     unsigned pos;
 } FwxBuffer;
 
+/**
+ * @brief Set buffer cursor to 0.
+ * @param self Buffer instance.
+ */
 static inline void fwx_buf_rewind(FwxBuffer *self) { self->pos = 0; }
-
+/**
+ * @brief Reset buffer state: data are zeroed, size and pos are set to 0, expected_size is set to
+ * \ref FWX_MAX_DATA_SIZE.
+ * @param self Buffer instance.
+ */
 void fwx_buf_reset(FwxBuffer *self);
+/**
+ * @brief Append a byte at the current cursor position (pos). Cursor position is moved forward
+ * (incremented).
+ * @param self Buffer instance.
+ * @param data Byte to put.
+ */
 void fwx_buf_put(FwxBuffer *self, uint8_t data);
+/**
+ * @brief Get byte at the current cursor position (pos). Cursor position is moved forward
+ * (incremented).
+ * @param self Buffer instance.
+ * @returns Byte pointed by pos (before it is incremented).
+ */
 uint8_t fwx_buf_get(FwxBuffer *self);
-
+/**
+ * @brief Get pointer to byte at the current cursor position (pos).
+ * @param self Buffer instance.
+ * @returns Pointer to the byte pointed by pos.
+ */
 static inline uint8_t *fwx_buf_ref(FwxBuffer *self) {
     return &self->data[self->pos];
 }
 
 typedef struct Bus Bus;
 
+/**
+ * State of FWX component.
+ */
 typedef struct Fwx {
     FwxRegs regs;
-    FwxBuffer tx; /* emu -> host */
-    FwxBuffer rx; /* host -> emu */
+    FwxBuffer tx; /**> Buffer for data transmission from emulator to the emulated program. */
+    FwxBuffer rx; /**> Buffer for data transmission from the emulated program to emulator. */
 
     Fs *fs;
     Bus *bus;
     Dir cwd;
     Disk disk;
 
-    FwxCmdId curr_cmd;
-    unsigned file_count;
+    FwxCmdId curr_cmd; /**> Current command ID (first byte from FWXDATA). */
+    unsigned file_count /**> Number of files in the current working directory. */;
 
     /* TODO: consider memory usage optimization (61.44 kB!) */
-    char files[256][256];
+    char files[256][256]; /**> List of filenames in the current working directory. */
 } Fwx;
 
+/**
+ * @brief Get pointer to byte at the current cursor position (pos).
+ * @param self FWX instance.
+ * @param fs Pointer to @ref Fs instance.
+ * @param bus Pointer to @ref Bus instance.
+ * @retvalue true Success.
+ * @retvalue false Failure.
+ */
 bool fwx_init(Fwx *self, Fs *fs, Bus *bus);
+/**
+ * @brief Reset FWX state.
+ * @param self FWX instance.
+ * @retvalue true Success.
+ * @retvalue false Failure when trying to reopen current working directory.
+ */
 bool fwx_reset(Fwx *self);
+/**
+ * @brief Reset state and free used resources.
+ * @param self FWX instance.
+ */
 void fwx_deinit(Fwx *self);
-
+/**
+ * @brief Get value of FWXDATA.
+ * @param self @ref FWX instance.
+ * @returns Value of FWXDATA.
+ */
 static inline uint8_t fwx_read_data(const Fwx *self) { return self->regs.DATA; }
-
+/**
+ * @brief Set value of FWXDATA.
+ * @param self @ref FWX instance.
+ * @param data Byte to write.
+ */
 static inline void fwx_write_data(Fwx *self, uint8_t data) {
     self->regs.DATA = data;
 }
-
+/**
+ * @brief Update file list of the current working directory.
+ * @param self @ref FWX instance.
+ * @returns Error code of last successful (or onsuccessful) filesystem operation.
+ */
 FsError fwx_update_file_list(Fwx *self);
+/**
+ * @brief Set last error code.
+ * @param self @ref FWX instance.
+ * @param err Error code to set.
+ */
 void fwx_set_error(Fwx *self, FwxError err);
+/**
+ * @brief MMIO write interface.
+ * @param self @ref FWX instance.
+ * @param addr Register address.
+ * @param data Byte to write.
+ */
 void fwx_write(Fwx *self, uint16_t addr, uint8_t data);
+/**
+ * @brief MMIO write interface.
+ * @param self @ref FWX instance.
+ * @param addr Register address.
+ * @param data Byte to write.
+ */
 uint8_t fwx_read(Fwx *self, uint16_t addr);
 uint8_t fwx_peek(const Fwx *self, uint16_t addr);
 uint8_t fwx_read_stat(Fwx *self);
