@@ -18,6 +18,11 @@
 
 #pragma once
 
+/**
+ * @file fwx/private.h
+ * @brief Emulator-side implementation of FWX protocol.
+ */
+
 #include "../disk.h"
 #include "../fs.h"
 #include "common.h"
@@ -54,6 +59,7 @@ typedef struct FwxBuffer {
  * @param self Buffer instance.
  */
 static inline void fwx_buf_rewind(FwxBuffer *self) { self->pos = 0; }
+
 /**
  * @brief Reset buffer state: data are zeroed, size and pos are set to 0, expected_size is set to
  * \ref FWX_MAX_DATA_SIZE.
@@ -74,6 +80,7 @@ void fwx_buf_put(FwxBuffer *self, uint8_t data);
  * @returns Byte pointed by pos (before it is incremented).
  */
 uint8_t fwx_buf_get(FwxBuffer *self);
+
 /**
  * @brief Get pointer to byte at the current cursor position (pos).
  * @param self Buffer instance.
@@ -107,65 +114,117 @@ typedef struct Fwx {
 
 /**
  * @brief Get pointer to byte at the current cursor position (pos).
- * @param self FWX instance.
+ * @param self Fwx instance.
  * @param fs Pointer to @ref Fs instance.
  * @param bus Pointer to @ref Bus instance.
- * @retvalue true Success.
- * @retvalue false Failure.
+ * @retval true Success.
+ * @retval false Failure.
  */
 bool fwx_init(Fwx *self, Fs *fs, Bus *bus);
 /**
  * @brief Reset FWX state.
- * @param self FWX instance.
- * @retvalue true Success.
- * @retvalue false Failure when trying to reopen current working directory.
+ *
+ * Buffers, registers, current error and command are zeroed. File list is updated.
+ *
+ * @param self Fwx instance.
+ * @retval true Success.
+ * @retval false Failure when trying to reopen current working directory.
  */
 bool fwx_reset(Fwx *self);
 /**
  * @brief Reset state and free used resources.
- * @param self FWX instance.
+ * @param self Fwx instance.
  */
 void fwx_deinit(Fwx *self);
+
 /**
  * @brief Get value of FWXDATA.
- * @param self @ref FWX instance.
+ * @param self @ref Fwx instance.
  * @returns Value of FWXDATA.
  */
 static inline uint8_t fwx_read_data(const Fwx *self) { return self->regs.DATA; }
+
 /**
  * @brief Set value of FWXDATA.
- * @param self @ref FWX instance.
+ * @param self @ref Fwx instance.
  * @param data Byte to write.
  */
 static inline void fwx_write_data(Fwx *self, uint8_t data) {
     self->regs.DATA = data;
 }
+
 /**
  * @brief Update file list of the current working directory.
- * @param self @ref FWX instance.
+ * @param self @ref Fwx instance.
  * @returns Error code of last successful (or onsuccessful) filesystem operation.
  */
 FsError fwx_update_file_list(Fwx *self);
 /**
  * @brief Set last error code.
- * @param self @ref FWX instance.
+ * @param self @ref Fwx instance.
  * @param err Error code to set.
  */
 void fwx_set_error(Fwx *self, FwxError err);
 /**
- * @brief MMIO write interface.
- * @param self @ref FWX instance.
+ * @brief MMIO write interface for bus.
+ * @param self @ref Fwx instance.
  * @param addr Register address.
  * @param data Byte to write.
  */
 void fwx_write(Fwx *self, uint16_t addr, uint8_t data);
 /**
- * @brief MMIO write interface.
- * @param self @ref FWX instance.
+ * @brief MMIO read interface (with side effects) for bus.
+ *
+ * When reading FWXSTAT, the S2 bit is cleared.
+ *
+ * @param self @ref Fwx instance.
  * @param addr Register address.
- * @param data Byte to write.
+ * @returns Value stored or returned by accessed register.
  */
 uint8_t fwx_read(Fwx *self, uint16_t addr);
+/**
+ * @brief MMIO read interface without side effects for bus.
+ * @param self @ref Fwx instance.
+ * @param addr Register address.
+ * @returns Value stored or returned by accessed register.
+ */
 uint8_t fwx_peek(const Fwx *self, uint16_t addr);
+/**
+ * @brief Read FWXSTAT register with side effects.
+ *
+ * This register reports the status of communication.
+ *
+ * When reading FWXSTAT, the S2 bit is cleared.
+ *
+ * @param self @ref Fwx instance.
+ * @returns Value stored or returned by accessed register.
+ */
 uint8_t fwx_read_stat(Fwx *self);
+/**
+ * @brief Write to FWXCTRL register with proper handling.
+ *
+ * This function controls communication, and its behavior depends on bits in @p value:
+ *
+ * - New SS = 1, old SS = 0: START condition.
+ * - New SS = 0, old SS = 1: STOP condition
+ * - SS = 1, new CLK = 1, old CLK = 0: edge clock
+ *
+ * @par START condition
+ *
+ * START condition begins communication. TX & RX buffers, current error and command are zeroed,
+ * except that S0 in FWXSTAT is set to 1.
+ *
+ * @par STOP condition
+ *
+ * STOP condition terminates communication. Current error and S0..S2 in FWXSTAT are zeroed, although
+ * buffers are not touched.
+ *
+ * @par Clock edge
+ *
+ * Clock edge triggers data transmission from emulator to emulated program (S1 is 1), or from
+ * emulated program to emulator (S1 is 0). Data transmission happens in a bytewise fashion.
+ *
+ * @param self @ref Fwx instance.
+ * @param value Value to write.
+ */
 void fwx_write_ctrl(Fwx *self, uint8_t value);
