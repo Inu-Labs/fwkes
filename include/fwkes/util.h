@@ -16,50 +16,21 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+#pragma once
+
 /**
  * @file util.h
  * @brief Utility macros, attributes, and platform-specific type definitions.
  *
- * This header centralizes low-level portability helpers used across the
- * codebase. It abstracts away compiler-specific attributes and
- * platform-specific integer widths so that the rest of the code can be
- * written in a target-agnostic way.
+ * This header provides:
  *
- * Specifically, this header provides:
- *  - @ref FORCE_INLINE  – compiler hint to always inline a function.
- *  - @ref NOTFLASH_FN   – attribute that places a function in RAM rather
- *                         than flash (RP2350 only; no-op elsewhere).
- *  - @ref CycleCounter  – unsigned integer type wide enough to hold a
- *                         hardware cycle-counter value on the current target.
- *  - @ref CycleDiff     – signed counterpart of CycleCounter, suitable for
- *                         expressing the difference between two timestamps.
- *
- * @par Supported platforms
- *  | Macro defined   | Target                        |
- *  |-----------------|-------------------------------|
- *  | BUILD_RP2350    | Raspberry Pi RP2350 (Pico SDK)|
- *  | *(none)*        | Generic desktop / host build  |
- *
- * @par Usage example
- * @code
- *  #include "util.h"
- *
- *  // Always inlined helper – zero call overhead in hot loops.
- *  FORCE_INLINE uint32_t saturate(uint32_t v, uint32_t max) {
- *      return v > max ? max : v;
- *  }
- *
- *  // Placed in RAM so it can safely run while flash is being erased.
- *  void NOTFLASH_FN(flash_safe_isr)(void) { ... }
- *
- *  // Portable timing measurement.
- *  CycleCounter t0 = read_cycle_counter();
- *  do_work();
- *  CycleDiff elapsed = (CycleDiff)(read_cycle_counter() - t0);
- * @endcode
+ *  - @ref FORCE_INLINE  - compiler hint to always inline a function.
+ *  - @ref NOTFLASH_FN   - attribute that places a function in RAM rather than flash (RP2350 only;
+ *      no-op elsewhere).
+ *  - @ref CycleCounter  - unsigned integer type wide enough to count emulator cycles.
+ *  - @ref CycleDiff     - signed counterpart of CycleCounter, suitable for
+ *                         expressing the difference between two cycle timestamps.
  */
-
-#pragma once
 
 #include <stdint.h>
 
@@ -73,23 +44,11 @@
 
 /**
  * @def FORCE_INLINE
- * @brief Decorator that instructs the compiler to always inline the function.
+ * @brief Decorator that hints the compiler to always inline the function.
  *
- * Combining `static`, `inline`, and GCC/Clang's `__attribute__((always_inline))`
- * guarantees that the function body is substituted at every call site,
- * regardless of the optimisation level or the compiler's own inlining
- * heuristics.
- *
- * @par When to use
- *  - Tiny, performance-critical helpers called in tight loops.
- *  - Functions whose call overhead would measurably affect timing.
- *  - Wrappers around a single instruction or intrinsic.
- *
- * @par When *not* to use
- *  - Large functions – forced inlining inflates code size and can hurt
- *    I-cache performance.
- *  - Functions that are only called once – the compiler already inlines
- *    those automatically.
+ * This function should be used with care: in some situations inlining can improve performance, while
+ * in some cases it either makes no difference, or makes performance worse (although the same applies
+ * to standard @c inline).
  *
  * @par Example
  * @code
@@ -104,58 +63,32 @@
  * Memory-placement helpers
  * ---------------------------------------------------------------------- */
 
-#ifdef BUILD_RP2350
 /**
  * @def NOTFLASH_FN(name)
- * @brief Places a function into SRAM instead of flash memory (RP2350 only).
+ * @brief Decorator that instructs compiler to place function code into RAM instead of Flash (RP2350
+ * only).
  *
- * On the RP2350 the default code storage is the external QSPI flash, which
- * is fetched through an XIP (execute-in-place) cache. While this is
- * transparent most of the time, it creates two problems:
+ * This is done by telling compiler (linker) to place the code to `.time_critical` section in the
+ * final binary file.
  *
- *  1. **Flash-unsafe operations** – certain operations (e.g. erasing or
- *     programming flash) temporarily disable XIP.  Any code still executing
- *     from flash at that moment will hard-fault.  Moving such code to SRAM
- *     via this macro avoids the hazard.
+ * This can be useful for performance-critical code (SRAM is faster than Flash), or executing code
+ * while writing to Flash, since XIP cache gets blocked.
  *
- *  2. **Deterministic latency** – XIP cache misses introduce variable
- *     latency that makes cycle-accurate timing difficult.  SRAM execution
- *     has fixed, predictable access time.
+ * On other platforms this just expands to @p name.
  *
- * Internally this macro expands to the Pico SDK helper
- * `__not_in_flash_func()`, which applies the linker section attribute
- * `.time_critical.<name>` and causes the function to be copied to SRAM by
- * the startup code.
- *
- * @note  The function body must **not** call any function that itself lives
- *        in flash (unless that function is also marked NOTFLASH_FN or is
- *        otherwise guaranteed to reside in SRAM).
- *
- * @param name  The bare (unquoted) function name, e.g. `my_isr`.
- *              Use it as: `void NOTFLASH_FN(my_isr)(void) { ... }`
+ * @param name Function name.
  *
  * @par Example
  * @code
- *  // Safe to call from a flash-erase context or a hard-IRQ handler.
- *  void NOTFLASH_FN(critical_timer_isr)(void) {
- *      gpio_put(LED_PIN, 1);
+ *  void NOTFLASH_FN(foo)(int a, int b) {
+ *      // e.g. performance-critical code...
  *  }
  * @endcode
  */
-#    define NOTFLASH_FN(name) __not_in_flash_func(name)
 
+#ifdef BUILD_RP2350
+#    define NOTFLASH_FN(name) __not_in_flash_func(name)
 #else
-/**
- * @def NOTFLASH_FN(name)
- * @brief No-op fallback for non-RP2350 targets.
- *
- * On desktop / host builds there is no flash-vs-RAM distinction, so this
- * macro expands to the function name unchanged.  Code that uses
- * `NOTFLASH_FN` therefore compiles and links correctly on all targets
- * without any `#ifdef` guards at the call site.
- *
- * @param name  The bare function name (passed through unmodified).
- */
 #    define NOTFLASH_FN(name) name
 #endif
 
@@ -163,58 +96,38 @@
  * Cycle-counter types
  * ---------------------------------------------------------------------- */
 
+/**
+ * @defgroup emu_cycle_counting Emulator cycle counting types
+ *
+ * For working with emulation cycle counters and timestamps, this API provides following types:
+ *
+ * - Unsigned @ref CycleCounter type for counting cycles.
+ * - Signed @ref CycleDiff type for calculating difference between two cycle timestamps.
+ *
+ * These types have the same size as platform's word size for performance reasons, since cycle
+ * counters are typically accessed frequently.
+ *
+ * On the RP2350 backend, these types are 32-bit wide. On the desktop backend, they are 64-bit wide.
+ *
+ * @{
+ */
+
+/**
+ * @typedef CycleCounter
+ * @brief Unsigned type suitable for counting emulation cycles.
+ */
+
+/**
+ * @typedef CycleDiff
+ * @brief Signed type for the difference between two @ref CycleCounter values.
+ */
+
 #ifdef BUILD_RP2350
-/**
- * @typedef CycleCounter
- * @brief Unsigned type that holds a raw hardware cycle-counter value (RP2350).
- *
- * On the RP2350 the cycle counter is a 32-bit register (accessible via the
- * Cortex-M33 DWT_CYCCNT peripheral).  Using a 32-bit type avoids the extra
- * instructions that 64-bit arithmetic would generate on a 32-bit core.
- *
- * @note  The counter wraps around after 2^32 cycles (~4 seconds at 150 MHz).
- *        Always compute differences with @ref CycleDiff to handle wrap-around
- *        correctly via two's-complement subtraction.
- */
 typedef uint32_t CycleCounter;
-
-/**
- * @typedef CycleDiff
- * @brief Signed type for the difference between two @ref CycleCounter values (RP2350).
- *
- * Subtracting two `CycleCounter` values and storing the result in a
- * `CycleDiff` correctly handles counter wrap-around as long as the measured
- * interval is shorter than 2^31 cycles (~14 seconds at 150 MHz).
- *
- * @par Example
- * @code
- *  CycleCounter start = dwt_get_cycle_count();
- *  do_work();
- *  CycleDiff elapsed = (CycleDiff)(dwt_get_cycle_count() - start);
- *  // elapsed is correct even if the counter wrapped around once.
- * @endcode
- */
 typedef int32_t CycleDiff;
-
 #else
-/**
- * @typedef CycleCounter
- * @brief Unsigned type that holds a raw hardware cycle-counter value (generic).
- *
- * On 64-bit desktop targets (Linux, macOS, Windows) performance counters are
- * typically 64-bit values (e.g. `clock_gettime(CLOCK_MONOTONIC)` nanoseconds,
- * or the x86 `RDTSC` instruction).  Using a 64-bit type avoids lossy
- * truncation and extends the wrap-around period to ~584 years at 1 GHz.
- */
 typedef uint64_t CycleCounter;
-
-/**
- * @typedef CycleDiff
- * @brief Signed type for the difference between two @ref CycleCounter values (generic).
- *
- * The signed 64-bit type can represent differences up to ~292 years worth of
- * nanoseconds, which is sufficient for any practical measurement on a desktop
- * host.
- */
 typedef int64_t CycleDiff;
 #endif
+
+/** @} */
