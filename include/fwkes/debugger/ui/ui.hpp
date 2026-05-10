@@ -1,15 +1,15 @@
 #pragma once
 
-#include "../message.hpp"
 #include "../emu.hpp"
+#include "../imgui.hpp"
+#include "../message.hpp"
 #include "canvas.hpp"
 #include "disassembler.hpp"
 #include "memory.hpp"
-#include "registers.hpp"
 #include "playback_recorder.hpp"
+#include "registers.hpp"
 
 #include <SDL3/SDL.h>
-#include <imgui.h>
 
 #include <string>
 

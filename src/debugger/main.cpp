@@ -5,9 +5,7 @@
 
 #include <SDL3/SDL.h>
 
-#include <imgui.h>
-#include <imgui_impl_sdl3.h>
-#include <imgui_impl_sdlrenderer3.h>
+#include <fwkes/debugger/imgui.hpp>
 
 #include <stdexcept>
 
@@ -50,7 +48,8 @@ update_controller(Joypad &joypad, const KeyMap &keymap, const bool *kbd_state) {
 }
 
 Debugger::Debugger(SDL_Window *win, SDL_Renderer *renderer)
-    : m_renderer{renderer}, m_emu { renderer }, m_ui{win, renderer, m_emu, m_msg_queue} {
+    : m_renderer{renderer}, m_emu{renderer},
+      m_ui{win, renderer, m_emu, m_msg_queue} {
     m_ui.canvas.set_texture(m_emu.canvas());
 }
 
@@ -72,9 +71,7 @@ void Debugger::run() {
     }
 }
 
-void Debugger::update() {
-    m_emu.update();
-}
+void Debugger::update() { m_emu.update(); }
 
 void Debugger::render() {
     SDL_SetRenderDrawColor(m_renderer, 0x00, 0x00, 0x00, 0xff);
@@ -185,8 +182,8 @@ int main() {
     SDL_Renderer *renderer;
 
     if (!SDL_CreateWindowAndRenderer(
-            "FWKES Debugger", 1280, 960, SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED,
-            &win, &renderer
+            "FWKES Debugger", 1280, 960,
+            SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED, &win, &renderer
         )) {
         SDL_Quit();
 

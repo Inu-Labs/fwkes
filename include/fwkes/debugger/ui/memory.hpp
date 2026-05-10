@@ -1,9 +1,8 @@
 #pragma once
 
 #include "../emu.hpp"
+#include "../imgui.hpp"
 #include "window.hpp"
-
-#include <imgui_memory_editor.h>
 
 namespace ui {
     enum class MemoryMap {
