@@ -129,46 +129,42 @@ static inline uint8_t buildNesState(ControllerPtr ctl) {
 
     uint8_t state = NES_NO_BUTTONS;
 
-    /* --------------------------------------------------------
-     * FACE BUTTONS
-     * -------------------------------------------------------- */
+    /* FACE BUTTONS */
 
     if (ctl->a()) {
-        state &= ~NES_BTN_B;
+        state &= ~0x02;
     }
 
     if (ctl->b()) {
-        state &= ~NES_BTN_SELECT;
+        state &= ~0x04;
     }
 
     if (ctl->x()) {
-        state &= ~NES_BTN_START;
+        state &= ~0x08;
     }
 
     if (ctl->y()) {
-        state &= ~NES_BTN_UP;
+        state &= ~0x10;
     }
 
-    /* --------------------------------------------------------
-     * DPAD
-     * -------------------------------------------------------- */
+    /* DPAD */
 
     uint8_t dpad = ctl->dpad();
 
     if (dpad & DPAD_UP) {
-        state &= ~NES_BTN_DOWN;
+        state &= ~0x20;
     }
 
     if (dpad & DPAD_DOWN) {
-        state &= ~NES_BTN_LEFT;
+        state &= ~0x40;
     }
 
     if (dpad & DPAD_LEFT) {
-        state &= ~NES_BTN_A;
+        state &= ~0x80;
     }
 
     if (dpad & DPAD_RIGHT) {
-        state &= ~NES_BTN_RIGHT;
+        state &= ~0x01;
     }
 
     return state;
