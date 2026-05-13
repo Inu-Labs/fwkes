@@ -166,7 +166,29 @@ mikrokontroléru, jehož stav by se měnil na začátku a na konci emulaci sním
 signálu pomocí osciloskopu nebo logického analyzátoru by bylo možné exaktně měřit výpočetní čas a
 snímkovou frekvenci s téměř nulovou softwarovou režií.
 
-\section{Verdikt}
+\section{Vlastní ladicí nástroje}
+
+S růstem komplexity projektu při emulaci PPU a APU, paralelně s emulátorem se pracovalo na vlastním
+ladicím nástroji (debuggeru), který umožňuje komplexní testování nejen emulátoru, ale i emulovaných
+programů.
+
+Tento nástroj je podobný běžným debuggerům, které se dá najít ve většině IDE: nabízí funkce jako
+zobrazení a modifikace registrů všech emulovaných komponentů, pohled do pamětí v hex editoru,
+nastavení breakpointů apod. Tento nástroj umožnil detailní ladění emulátoru na desktopu, jelikož
+poskytoval pohodlné prostředky pro zobrazení stavu, ovládání a konfiguraci emulátoru. Kromě
+rozšíření ladicích možností, to také v dlouhodobém pohledu ušetřilo čas a energii.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/debugger.png}
+    \caption{Screenshot debuggeru.}
+    \label{fig:debugger}
+\end{figure}
+
+Do budoucna se plánuje pokročit dál a vyvinout plnohodnotné vývojové prostředí, které dovolí
+nejen ladit NES programy, ale také i psát vlastní.
+
+\section{Závěr}
 
 Výsledný emulátor dosahuje vysoké míry věrnosti původnímu hardwaru, která v mnoha ohledech překonává
 běžné amatérské implementace. Přestože z hlediska absolutní přesnosti

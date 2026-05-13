@@ -14,6 +14,7 @@
 \RequirePackage{csquotes}
 \RequirePackage[backend=biber,bibstyle=numeric,sorting=none,date=long,dateabbrev=false,texencoding=utf8,bibencoding=utf8,style=iso-numeric]{biblatex}
 \RequirePackage{caption}
+\RequirePackage{setspace}
 \RequirePackage{parskip}
 \RequirePackage[margin=2.5cm, bindingoffset=1cm]{geometry}
 \RequirePackage{titlesec}
@@ -161,54 +162,50 @@
     % \vfill
 
     \section*{Prohlášení}
-    % Prohlašujeme, že naši práci na téma \It{\@titlecz} jsme vypracovali samostatně pod vedením
-    % {\@mentorstatement} a~s~použitím odborné literatury a~dalších informačních zdrojů, které jsou
-    % všechny citovány v~práci a~uvedeny v~seznamu literatury na~konci práce.
-    %
-    % Dále prohlašujeme, že tištěná i~elektronická verze práce SOČ jsou shodné a~nemáme závažný důvod
-    % proti zpřístupňování této práce v~souladu se~zákonem č.~121/2000~Sb., o~právu autorském,
-    % o~právech souvisejících s~právem autorským a~změně některých zákonů (autorský zákon) v~platném
-    % změní.
 
-    Prohlašujeme, že jsme naši práci SOČ vypracovali samostatně a použili jsme pouze prameny a
-    literaturu uvedené v seznamu bibliografických záznamů.
+    \begin{spacing}{1.25}
+        Prohlašujeme, že jsme naši práci SOČ vypracovali samostatně a použili jsme pouze prameny a
+        literaturu uvedené v seznamu bibliografických záznamů.
 
-    Bereme na vědomí, že nejpozději odevzdáním slovesné vědecké práce do veřejné soutěže Středoškolská
-    odborná činnost, stejně jako odevzdáním jejích příloh a dalších připojených děl, např.
-    audiovizuálních, fotografických, výtvarných, architektonických apod. (dále jen „soutěžní dílo“),
-    dochází ke zveřejnění díla podle § 4 odst. 1 zákona č. 121/2000 Sb., autorského zákona, ve znění
-    pozdějších předpisů (dále jen „autorský zákon“). Totéž platí pro pozdější odevzdání doplněného,
-    změněného, upraveného nebo opraveného díla.
+        Bereme na vědomí, že nejpozději odevzdáním slovesné vědecké práce do veřejné soutěže Středoškolská
+        odborná činnost, stejně jako odevzdáním jejích příloh a dalších připojených děl, např.
+        audiovizuálních, fotografických, výtvarných, architektonických apod. (dále jen „soutěžní dílo“),
+        dochází ke zveřejnění díla podle § 4 odst. 1 zákona č. 121/2000 Sb., autorského zákona, ve znění
+        pozdějších předpisů (dále jen „autorský zákon“). Totéž platí pro pozdější odevzdání doplněného,
+        změněného, upraveného nebo opraveného díla.
 
-    Bereme na vědomí, že zveřejněním díla, jehož součástí je vynález, se tento vynález stává součástí
-    stavu techniky podle § 5 odst. 1, 2 zákona č. 527/1990 Sb., o vynálezech, průmyslových vzorech a
-    zlepšovacích návrzích, ve znění pozdějších předpisů (dále jen „patentový zákon“), což zakládá
-    překážku pro udělení patentu podle § 3 odst. 1 patentového zákona.
+        Bereme na vědomí, že zveřejněním díla, jehož součástí je vynález, se tento vynález stává součástí
+        stavu techniky podle § 5 odst. 1, 2 zákona č. 527/1990 Sb., o vynálezech, průmyslových vzorech a
+        zlepšovacích návrzích, ve znění pozdějších předpisů (dále jen „patentový zákon“), což zakládá
+        překážku pro udělení patentu podle § 3 odst. 1 patentového zákona.
 
-    Bereme na vědomí, že vyhlašovatel soutěže je podle § 61 odst. 1 autorského zákona per analogiam
-    oprávněn užít soutěžní dílo pro účely zajištění průběhu soutěže, zejména k zajištění
-    transparentnosti soutěže a veřejnosti obhajob soutěžních prací. V odůvodněném rozsahu je tedy
-    vyhlašovatel po dobu účasti autorů v soutěži oprávněn zejména:
+        Bereme na vědomí, že vyhlašovatel soutěže je podle § 61 odst. 1 autorského zákona per analogiam
+        oprávněn užít soutěžní dílo pro účely zajištění průběhu soutěže, zejména k zajištění
+        transparentnosti soutěže a veřejnosti obhajob soutěžních prací. V odůvodněném rozsahu je tedy
+        vyhlašovatel po dobu účasti autorů v soutěži oprávněn zejména:
 
-    \begin{itemize}
-        \item zhotovovat rozmnoženiny díla, je-li to nezbytné k seznámení účastníků soutěže, porotců
-        nebo veřejnosti se soutěžní prací;
-        \item zapůjčit originál nebo rozmnoženinu díla účastníkům soutěže, porotcům nebo veřejnosti.
-        Přitom dbá na bezpečné nakládání s dílem;
-        \item vystavovat originál nebo rozmnoženinu díla v průběhu soutěžních přehlídek a doprovodných
-        akcí;
-        \item sdělovat dílo veřejnosti v nehmotné podobě, a to především počítačovou nebo obdobnou sítí.
-    \end{itemize}
+        \begin{itemize}
+            \item zhotovovat rozmnoženiny díla, je-li to nezbytné k seznámení účastníků soutěže, porotců
+            nebo veřejnosti se soutěžní prací;
+            \item zapůjčit originál nebo rozmnoženinu díla účastníkům soutěže, porotcům nebo veřejnosti.
+            Přitom dbá na bezpečné nakládání s dílem;
+            \item vystavovat originál nebo rozmnoženinu díla v průběhu soutěžních přehlídek a doprovodných
+            akcí;
+            \item sdělovat dílo veřejnosti v nehmotné podobě, a to především počítačovou nebo obdobnou sítí.
+        \end{itemize}
 
-    Dále prohlašujeme, že při tvorbě této práce jsme použili následující nástroje generativního
-    modelu AI:
+        Dále prohlašujeme, že při tvorbě této práce jsme použili následující nástroje generativního
+        modelu AI:
 
-    \begin{itemize}
-        \item ChatGPT (\url{https://chatgpt.com/}) -- kontrola gramatiky, úprava textu.
-        \item Google Gemini (\url{https://gemini.google.com/}) -- kontrola gramatiky, úprava textu.
-    \end{itemize}
+        \begin{itemize}
+            \item ChatGPT (\url{https://chatgpt.com/}) -- kontrola gramatiky, mírná úprava textu se
+                zachováním autorských myšlenek a stylistiky.
+            \item Google Gemini (\url{https://gemini.google.com/}) -- kontrola gramatiky, mírná úprava
+                textu se zachováním autorských myšlenek a stylistiky.
+        \end{itemize}
 
-    Po použití těchto nástrojů jsme provedli kontrolu obsahu a přebíráme za něj plnou zodpovědnost.
+        Po použití těchto nástrojů jsme provedli kontrolu obsahu a přebíráme za něj plnou zodpovědnost.
+    \end{spacing}
 
     \vspace{10mm}
 
