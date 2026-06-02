@@ -131,7 +131,7 @@ typedef enum TraceType {
  * @brief Emits a formatted trace message (internal implementation).
  *
  * This is the underlying implementation called by all category-specific
- * macros.  Prefer the macros (@ref trace, @ref trace_bus, …) over calling
+ * macros.  Prefer the macros (@ref trace, @ref trace_bus, ...) over calling
  * this function directly, as the macros automatically capture `__LINE__` and
  * `__FILE__` and can be compiled out entirely when tracing is disabled.
  *
@@ -163,8 +163,7 @@ void trace_(
  * @param type  Event type @ref TraceType.
  * @param fmt   `printf`-style format string.
  * @param ...   Format arguments matching @p fmt.
- * @param vargs  Argument list initialised by the caller with `va_start`.
- *               The caller is responsible for calling `va_end` afterwards.
+ * @param vargs  Argument list initialized by the caller with `va_start`.
  */
 void vtrace(
     TraceCategory cat, int line, const char *file, TraceType type,
