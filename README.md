@@ -23,6 +23,11 @@ board.
 - To allow emulated programs make use of peripherals like SD card, or configure emulator's behavior,
   there is a bridge (hypercall interface) called FWX.
   
+<img width="1939" height="1089" alt="fwkes" src="https://github.com/user-attachments/assets/1945d1e4-d2a4-43a1-9c76-a94c4f0aaa1a" />
+<img width="1939" height="1089" alt="pcb_low" src="https://github.com/user-attachments/assets/4506caa3-f269-4394-a9f8-f8b2226fdd8f" />
+
+
+
 <img width="559" alt="IMG_20260512_191624" src="https://github.com/user-attachments/assets/1097341c-2204-4e90-8227-d03ecbf42125" />
 <img width="508" alt="motherboard" src="https://github.com/user-attachments/assets/36ba81ca-0e24-46b2-9c1b-fc83861de646" />
 
