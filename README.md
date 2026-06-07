@@ -25,6 +25,7 @@ board.
   
 <img width="1939" height="1089" alt="fwkes" src="https://github.com/user-attachments/assets/1945d1e4-d2a4-43a1-9c76-a94c4f0aaa1a" />
 <img width="1939" height="1089" alt="pcb_low" src="https://github.com/user-attachments/assets/4506caa3-f269-4394-a9f8-f8b2226fdd8f" />
+<img width="6000" height="3368" alt="fwkes_back" src="https://github.com/user-attachments/assets/4808bebb-d9c0-4904-bde5-d94cf89d2ea7" />
 
 
 
