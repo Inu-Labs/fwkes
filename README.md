@@ -28,11 +28,100 @@ board.
 <img width="6000" height="3368" alt="fwkes_back" src="https://github.com/user-attachments/assets/4808bebb-d9c0-4904-bde5-d94cf89d2ea7" />
 
 
-## Building
+# Building
+
+Although FWKES is aimed at RP2350-based boards, there are development builds for desktop. Desktop
+uses SDL3 to handle video, audio and inputs, and it's intended for superficial testing of
+non-RP2350-specific aspects.
+
+There is also an ongoing development of debugger, which allows complex testing not only of FWKES
+itself, but also emulated programs and games. It's code can be found in the `debugger` branch.
+
+## Dependencies
+
+For RP2350 based, you'll need [ARM GCC compiler toolchain with C11
+support](https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads) and [extracted Pico
+SDK](https://github.com/raspberrypi/pico-sdk).
+
+For desktop and debugger versions, only [SDL3](https://www.libsdl.org/) is required to be installed
+and usable by CMake. Both GCC and Clang are usable.
+
+For general building, you'll also need [CMake](https://cmake.org/) and [Git](https://git-scm.com/).
+
+Many of listed tools are available in distribution's repositories on Linux.
+
+## Cloning
+
+Since most dependencies are handled using Git submodules, you need to use `git clone --recursive
+https://github.com/Inu-Labs/fwkes.git`. Alternatively, if you already cloned and submodules are not
+initialized, you need to run `git submodule update --init --recursive --progress`.
+
+## Raspberry Pi Pico 2
+
+`-DBUILD_RP2350=ON` must be specified when compiling for official Pico 2:
+
+```sh
+mkdir build
+cd build
+cmake -DPICO_SDK_PATH=path_to_extracted_pico-sdk -DCMAKE_BUILD_TYPE=Release -GNinja -DBUILD_RP2350=ON ..
+```
+
+## Pimoroni Pico Plus 2
+
+Both `-DBUILD_RP2350=ON` and `-DBUILD_PIMORONI2=ON` must be specified when compiling for Pimoroni 2:
+
+```sh
+mkdir build
+cd build
+cmake -DPICO_SDK_PATH=path_to_extracted_pico-sdk -DCMAKE_BUILD_TYPE=Release -GNinja -DBUILD_RP2350=ON -DBUILD_PIMORONI2=ON ..
+```
+
+## Desktop
+
+Pass `-DBUILD_DESKTOP=ON`:
+
+```sh
+mkdir build
+cd build
+cmake -GNinja -DBUILD_DESKTOP=ON -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ..
+```
+
+## Debugger
+
+Pass both `-DBUILD_DESKTOP=ON` and `-DBUILD_DEBUGGER=ON`:
+
+```sh
+mkdir build
+cd build
+cmake -GNinja -DBUILD_DESKTOP=ON -DBUILD_DEBUGGER=ON -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ..
+```
+
+## Tests (development only)
+
+To build tests, pass `-DBUILD_TESTS=ON` and `-DBUILD_VISUAL_TESTS=ON`:
+
+```sh
+mkdir build
+cd build
+cmake -GNinja -DBUILD_DESKTOP=ON -DBUILD_TESTS=ON -DBUILD_VISUAL_TESTS=ON ..
+```
+
+`-DBUILD_VISUAL_TESTS=ON` is required for tests that depend on SDL3.
+
+## Flashing firmware
+
+To flash compiled firmware to RP2350 board, you can either:
+
+- Copy `build/src/rp2350/fwkes-rp2350.uf2` to the board. Note that the board must be booted in the BOOTSEL mode to perform this (otherwise it will not even appear in your file manager).
+- Use [picotool](https://github.com/raspberrypi/picotool): `picotool load build/src/rp2350/fwkes-rp2350.uf2 -f && picotool reboot`
+
+A CMake rule for this is planned in the future.
+
+## Electronics, case
 
 *TODO*
 
-## License & Acknowledgement
+# License & Acknowledgement
 
 Code of FWKES is licensed under [GNU GPL v2.0](LICENSE.txt), while hardware (schematics, PCB designs
 and 3D models) is licensed under [CERN Open Hardware Licence Version 2 (Strongly
