@@ -385,3 +385,5 @@ compile_commands.json
 
 *.bkp
 *.dtmp
+
+docs/html/
