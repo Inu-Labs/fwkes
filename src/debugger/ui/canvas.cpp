@@ -8,10 +8,8 @@ Canvas::Canvas(SDL_Texture *texture)
     : Window{"Canvas", 0}, m_texture{texture} {}
 
 void Canvas::main() {
-    /*
-     * Center image, pad it horizontally and maintain same ratio when window is
-     * being resized
-     */
+    // Center image, pad it horizontally and maintain same ratio when window is
+    // being resized
 
     float tw, th;
     SDL_GetTextureSize(m_texture, &tw, &th);

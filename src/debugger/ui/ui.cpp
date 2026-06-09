@@ -6,24 +6,27 @@
 
 using namespace ui;
 
-Ui::Ui(SDL_Window *win, SDL_Renderer *renderer, Emulator &emu, MessageQueue &msg_queue)
-    : disassembler{emu}, regs{emu}, memory_view{emu}, playback_recorder{emu}, canvas{nullptr},
-      m_renderer{renderer}, m_emu{emu}, m_msg_queue{msg_queue} {
+Ui::Ui(
+    SDL_Window *win, SDL_Renderer *renderer, Emulator &emu,
+    MessageQueue &msg_queue
+)
+    : disassembler{emu}, regs{emu}, memory_view{emu}, playback_recorder{emu},
+      canvas{nullptr}, m_renderer{renderer}, m_emu{emu},
+      m_msg_queue{msg_queue} {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
 
     ImGuiIO &io = ImGui::GetIO();
-    io.IniFilename = NULL;
     io.ConfigFlags |=
         ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_DockingEnable;
     m_io = &ImGui::GetIO();
-    io.Fonts->AddFontFromFileTTF("/usr/share/fonts/TTF/RobotoMono-Regular.ttf", 18.0f, NULL);
+    io.Fonts->AddFontDefault();
 
     ImFontConfig fc;
     fc.MergeMode = true;
     fc.GlyphMinAdvanceX = 16.0f;
     fc.GlyphOffset.y = 5.f;
-    io.Fonts->AddFontFromFileTTF("assets/fonts/codicons.ttf", 16.0f, &fc);
+    io.Fonts->AddFontFromFileTTF("assets/fonts/codicons.ttf", 15.0f, &fc);
 
     ImGuiStyle &style = ImGui::GetStyle();
     style.WindowRounding = 0.f;
@@ -98,9 +101,7 @@ void Ui::show_error(const std::string &err) {
     m_open_error_popup = true;
 }
 
-void Ui::request_quit() {
-    m_open_quit_popup = true;
-}
+void Ui::request_quit() { m_open_quit_popup = true; }
 
 void Ui::input() {
     if (ImGui::IsKeyPressed(ImGuiKey_Escape)) {
@@ -119,7 +120,7 @@ void Ui::input() {
 void Ui::main_menu_bar() {
     if (ImGui::BeginMenuBar()) {
         if (ImGui::BeginMenu("File")) {
-            if (ImGui::MenuItem(ICON_CI_FILE_CODE " Load ROM")) {
+            if (ImGui::MenuItem(ICON_CI_FOLDER " Open ROM")) {
                 IGFD::FileDialogConfig fdc;
                 fdc.path = ".";
                 fdc.flags = ImGuiFileDialogFlags_Modal |
@@ -366,10 +367,12 @@ void Ui::tool_bar() {
         ImGui::EndDisabled();
 
         ImGui::BeginDisabled(
-            m_emu.state() != EmuState::Running && m_emu.state() != EmuState::Paused
+            m_emu.state() != EmuState::Running &&
+            m_emu.state() != EmuState::Paused
         );
 
-        if (m_emu.state() == EmuState::Running || m_emu.state() == EmuState::Idle) {
+        if (m_emu.state() == EmuState::Running ||
+            m_emu.state() == EmuState::Idle) {
             if (ImGuiExt::toolbar_btn(ICON_CI_DEBUG_PAUSE, 0x007acc)) {
                 m_msg_queue.emplace(MessageId::Pause);
             }
