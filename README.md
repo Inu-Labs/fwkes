@@ -1,4 +1,4 @@
-![FWKES logo](./logo.svg)
+![FWKES logo](./logo.png)
 
 FWKES[^1] is an open-source NES emulator targeted at 32-bit microcontroller RP2350. It aims to be
 precise and cycle-accurate, while still maintaining stable 60 FPS and minimal latency.
