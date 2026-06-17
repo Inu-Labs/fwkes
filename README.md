@@ -52,7 +52,7 @@ Many of listed tools are available in distribution's repositories on Linux.
 
 ## Cloning
 
-Since most dependencies are handled using Git submodules, you need to use `git clone --recursive
+Since most dependencies are handled using Git submodules, you need to use `git clone --recurse-submodules
 https://github.com/Inu-Labs/fwkes.git`. Alternatively, if you already cloned and submodules are not
 initialized, you need to run `git submodule update --init --recursive --progress`.
 
